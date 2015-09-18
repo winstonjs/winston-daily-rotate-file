@@ -1,0 +1,25 @@
+{
+  "name": "winston-daily-rotate-file",
+  "version": "0.0.0",
+  "description": "A transport for winston which logs to a rotating file each day.",
+  "main": "index.js",
+  "scripts": {
+    "test": "istanbul cover ./node_modules/.bin/_mocha test/*.tests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/winstonjs/winston-daily-rotate-file.git"
+  },
+  "keywords": [
+    "winston",
+    "daily-rotate-file",
+    "log-rotate",
+    "logrotate"
+  ],
+  "author": "Charlie Robbins <charlie.robbins@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/winstonjs/winston-daily-rotate-file/issues"
+  },
+  "homepage": "https://github.com/winstonjs/winston-daily-rotate-file#readme"
+}
