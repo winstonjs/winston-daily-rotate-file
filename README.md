@@ -2,7 +2,7 @@
 A transport for winston which logs to a rotating file each day.
 
 ``` js
-  winston.add(require('winston-daily-rotate-file), options)
+  winston.add(require('winston-daily-rotate-file'), options)
 ```
 
 The DailyRotateFile transport can rotate files by minute, hour, day, month or year. Its options are identical to the File transport with the lone addition of the 'datePattern' option:
