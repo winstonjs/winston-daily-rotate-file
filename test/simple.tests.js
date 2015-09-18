@@ -10,8 +10,14 @@ var path = require('path'),
     vows = require('vows'),
     fs = require('fs'),
     assert = require('assert'),
-    winston = require('../../lib/winston'),
-    helpers = require('../helpers');
+    winston = require('winston');
+
+var helpers = {
+  assertDailyRotateFile: function (transport) {
+    assert.instanceOf(transport, winston.transports.DailyRotateFile);
+    assert.isFunction(transport.log);
+  }
+};
 
 var transport = require('./transport');
 
