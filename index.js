@@ -80,6 +80,7 @@ var DailyRotateFile = exports.DailyRotateFile = function (options) {
   this.depth       = options.depth       || null;
   this.eol         = options.eol || os.EOL;
   this.maxRetries  = options.maxRetries || 2;
+  this.tailable    = options.tailable    || false;
 
   if (this.json) {
     this.stringify = options.stringify;
@@ -563,21 +564,48 @@ DailyRotateFile.prototype._getFile = function (inc) {
     // checked by this instance.
     //
     // Check for maxFiles option and delete file
-    if (this.maxFiles && (this._created >= (this.maxFiles - 1))) {
-      remaining = this._created - (this.maxFiles - 1);
-      if (remaining === 0) {
-        fs.unlinkSync(path.join(this.dirname, filename));
+    if (!this.tailable) { 
+      if (this.maxFiles && (this._created >= (this.maxFiles - 1))) {
+        remaining = this._created - (this.maxFiles - 1);
+        if (remaining === 0) {
+          fs.unlinkSync(path.join(this.dirname, filename));
+        }
+        else {
+          fs.unlinkSync(path.join(this.dirname, filename + '.' + remaining));
+        }
       }
-      else {
-        fs.unlinkSync(path.join(this.dirname, filename + '.' + remaining));
+      this._created += 1;
+    } else {
+      this._created += 1;
+      if (this.maxFiles && (this._created >= this.maxFiles)) {
+          fs.unlinkSync(path.join(this.dirname, filename + '.' + (this._created - this.maxFiles + 1)));
+      }
+      if (this.tailable) { 
+        var newFilePath = path.join(this.dirname, filename + '.' + this._created)
+        fs.renameSync(path.join(this.dirname, filename), newFilePath);
       }
     }
-
-    this._created += 1;
+  }
+  if ((!this._created || this._created === 0) && this.tailable) {
+    var files = fs.readdirSync(this.dirname);
+    files = files.filter(function(element, index, array){
+        return element.indexOf(filename) != -1
+    });
+    var higherSequenceNumber = 0;
+    files.forEach(function(element, index, array){
+      var sequenceNumber = element.replace(filename, '').replace('.', '');
+      if (sequenceNumber.length > 0) {
+        sequenceNumber = parseFloat(sequenceNumber);
+        if(sequenceNumber > higherSequenceNumber){
+          higherSequenceNumber = sequenceNumber;
+        }
+      }
+    });
+    this._created = higherSequenceNumber;
   }
 
   return this._created
-    ? filename + '.' + this._created
+    ? (this.tailable ? filename : filename + '.' + this._created)
     : filename;
 };
 
