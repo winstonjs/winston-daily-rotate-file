@@ -14,7 +14,7 @@ var path = require('path'),
 
 var helpers = {
   assertDailyRotateFile: function (transport) {
-    assert.instanceOf(transport, winston.transports.DailyRotateFile);
+    assert.instanceOf(transport, winston.transports.DailyRotateFileTailable);
     assert.isFunction(transport.log);
   }
 };
@@ -24,14 +24,14 @@ var transport = require('./transport');
 var stream = fs.createWriteStream(
       path.join(__dirname, '..', 'fixtures', 'logs', 'testfile.log.2012-12-18')
     ),
-    dailyRotateFileTransport = new (winston.transports.DailyRotateFile)({
+    dailyRotateFileTransport = new (winston.transports.DailyRotateFileTailable)({
       filename: path.join(__dirname, '..', 'fixtures', 'logs', 'testfilename.log'),
       datePattern: '.yyyy-MM-dd'
     }),
-    failedDailyRotateFileTransport = new (winston.transports.DailyRotateFile)({
+    failedDailyRotateFileTransport = new (winston.transports.DailyRotateFileTailable)({
       filename: path.join(__dirname, '..', 'fixtures', 'logs', 'dir404', 'testfile.log')
     }),
-    streamTransport = new (winston.transports.DailyRotateFile)({ stream: stream });
+    streamTransport = new (winston.transports.DailyRotateFileTailable)({ stream: stream });
 
 vows.describe('winston/transports/daily-rotate-file').addBatch({
   "An instance of the Daily Rotate File Transport": {
@@ -72,7 +72,7 @@ vows.describe('winston/transports/daily-rotate-file').addBatch({
     }
   }
 }).addBatch({
-  "An instance of the Daily Rotate File Transport": transport(winston.transports.DailyRotateFile, {
+  "An instance of the Daily Rotate File Transport": transport(winston.transports.DailyRotateFileTailable, {
     filename: path.join(__dirname, '..', 'fixtures', 'logs', 'testfile.log'),
     datePattern: '.2012-12-18'
   })

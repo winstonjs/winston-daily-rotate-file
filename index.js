@@ -16,12 +16,12 @@ var events = require('events'),
     os = require('os');
 
 //
-// ### function DailyRotateFile (options)
+// ### function DailyRotateFileTailable (options)
 // #### @options {Object} Options for this instance.
-// Constructor function for the DailyRotateFile transport object responsible
+// Constructor function for the DailyRotateFileTailable transport object responsible
 // for persisting log messages and metadata to one or more files.
 //
-var DailyRotateFile = exports.DailyRotateFile = function (options) {
+var DailyRotateFileTailable = exports.DailyRotateFileTailable = function (options) {
   Transport.call(this, options);
 
   //
@@ -134,12 +134,12 @@ var DailyRotateFile = exports.DailyRotateFile = function (options) {
 //
 // Inherit from `winston.Transport`.
 //
-util.inherits(DailyRotateFile, Transport);
+util.inherits(DailyRotateFileTailableTailable, Transport);
 
 //
 // Expose the name of this Transport on the prototype
 //
-DailyRotateFile.prototype.name = 'dailyRotateFile';
+DailyRotateFileTailable.prototype.name = 'DailyRotateFileTailable';
 
 //
 // ### function log (level, msg, [meta], callback)
@@ -149,7 +149,7 @@ DailyRotateFile.prototype.name = 'dailyRotateFile';
 // #### @callback {function} Continuation to respond to when complete.
 // Core logging method exposed to Winston. Metadata is optional.
 //
-DailyRotateFile.prototype.log = function (level, msg, meta, callback) {
+DailyRotateFileTailable.prototype.log = function (level, msg, meta, callback) {
   if (this.silent) {
     return callback(null, true);
   }
@@ -213,7 +213,7 @@ DailyRotateFile.prototype.log = function (level, msg, meta, callback) {
 // #### @cb {function} Continuation to respond to when complete.
 // Write to the stream, ensure execution of a callback on completion.
 //
-DailyRotateFile.prototype._write = function(data, callback) {
+DailyRotateFileTailable.prototype._write = function(data, callback) {
   // If this is a file write stream, we could use the builtin
   // callback functionality, however, the stream is not guaranteed
   // to be an fs.WriteStream.
@@ -233,7 +233,7 @@ DailyRotateFile.prototype._write = function(data, callback) {
 // #### @callback {function} Continuation to respond to when complete.
 // Query the transport. Options object is optional.
 //
-DailyRotateFile.prototype.query = function (options, callback) {
+DailyRotateFileTailable.prototype.query = function (options, callback) {
   if (typeof options === 'function') {
     callback = options;
     options = {};
@@ -333,7 +333,7 @@ DailyRotateFile.prototype.query = function (options, callback) {
 // #### @options {Object} Stream options for this instance.
 // Returns a log stream for this transport. Options object is optional.
 //
-DailyRotateFile.prototype.stream = function (options) {
+DailyRotateFileTailable.prototype.stream = function (options) {
   var file = path.join(this.dirname, this._basename + this.getFormattedDate()),
       options = options || {},
       stream = new Stream;
@@ -371,7 +371,7 @@ DailyRotateFile.prototype.stream = function (options) {
 // Checks to see if a new file needs to be created based on the `maxsize`
 // (if any) and the current size of the file used.
 //
-DailyRotateFile.prototype.open = function (callback) {
+DailyRotateFileTailable.prototype.open = function (callback) {
   var now = new Date();
   if (this.opening) {
     //
@@ -402,7 +402,7 @@ DailyRotateFile.prototype.open = function (callback) {
 // ### function close ()
 // Closes the stream associated with this instance.
 //
-DailyRotateFile.prototype.close = function () {
+DailyRotateFileTailable.prototype.close = function () {
   var self = this;
 
   if (this._stream) {
@@ -421,7 +421,7 @@ DailyRotateFile.prototype.close = function () {
 // Flushes any buffered messages to the current `stream`
 // used by this instance.
 //
-DailyRotateFile.prototype.flush = function () {
+DailyRotateFileTailable.prototype.flush = function () {
   var self = this;
 
   //
@@ -459,7 +459,7 @@ DailyRotateFile.prototype.flush = function () {
 // Attempts to open the next appropriate file for this instance
 // based on the common state (such as `maxsize` and `_basename`).
 //
-DailyRotateFile.prototype._createStream = function () {
+DailyRotateFileTailable.prototype._createStream = function () {
   var self = this;
   this.opening = true;
 
@@ -553,7 +553,7 @@ DailyRotateFile.prototype._createStream = function () {
 // Gets the next filename to use for this instance
 // in the case that log filesizes are being capped.
 //
-DailyRotateFile.prototype._getFile = function (inc) {
+DailyRotateFileTailable.prototype._getFile = function (inc) {
   var self = this,
       filename = this._basename + this.getFormattedDate(),
       remaining;
@@ -615,7 +615,7 @@ DailyRotateFile.prototype._getFile = function (inc) {
 // drained. This is really just a simple mutex that only works because
 // Node.js is single-threaded.
 //
-DailyRotateFile.prototype._lazyDrain = function () {
+DailyRotateFileTailable.prototype._lazyDrain = function () {
   var self = this;
 
   if (!this._draining && this._stream) {
