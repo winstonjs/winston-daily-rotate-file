@@ -10,53 +10,55 @@ var path = require('path'),
     vows = require('vows'),
     fs = require('fs'),
     assert = require('assert'),
-    winston = require('winston');
+    winston = require('winston'),
+    helpers = require('winston/test/helpers'),
+    DailyRotateFile = require('../');
 
-var helpers = {
-  assertDailyRotateFile: function (transport) {
-    assert.instanceOf(transport, winston.transports.DailyRotateFile);
-    assert.isFunction(transport.log);
-  }
+
+function assertDailyRotateFile(transport) {
+  assert.instanceOf(transport, DailyRotateFile);
+  assert.isFunction(transport.log);
 };
 
-var transport = require('./transport');
+var transportTestSuite = require('winston/test/transports/transport');
 
-var stream = fs.createWriteStream(
-      path.join(__dirname, '..', 'fixtures', 'logs', 'testfile.log.2012-12-18')
-    ),
-    dailyRotateFileTransport = new (winston.transports.DailyRotateFile)({
-      filename: path.join(__dirname, '..', 'fixtures', 'logs', 'testfilename.log'),
-      datePattern: '.yyyy-MM-dd'
-    }),
-    failedDailyRotateFileTransport = new (winston.transports.DailyRotateFile)({
-      filename: path.join(__dirname, '..', 'fixtures', 'logs', 'dir404', 'testfile.log')
-    }),
-    streamTransport = new (winston.transports.DailyRotateFile)({ stream: stream });
+var fixturesDir = path.join(__dirname, 'fixtures');
+var stream = fs.createWriteStream(path.join(fixturesDir, 'testfile.log.2012-12-18'));
+var transports = {
+  standard: new DailyRotateFile({
+    filename: path.join(fixturesDir, 'testfilename.log'),
+    datePattern: '.yyyy-MM-dd'
+  }),
+  failed: new DailyRotateFile({
+    filename: path.join(fixturesDir, 'dir404', 'testfile.log')
+  }),
+  stream: new DailyRotateFile({ stream: stream })
+};
 
 vows.describe('winston/transports/daily-rotate-file').addBatch({
   "An instance of the Daily Rotate File Transport": {
     "when passed a valid filename": {
       "should have the proper methods defined": function () {
-        helpers.assertDailyRotateFile(dailyRotateFileTransport);
+        assertDailyRotateFile(transports.standard);
       },
-      "the log() method": helpers.testNpmLevels(dailyRotateFileTransport, "should respond with true", function (ign, err, logged) {
+      "the log() method": helpers.testNpmLevels(transports.standard, "should respond with true", function (ign, err, logged) {
         assert.isNull(err);
         assert.isTrue(logged);
       })
     },
     "when passed an invalid filename": {
       "should have proper methods defined": function () {
-        helpers.assertDailyRotateFile(failedDailyRotateFileTransport);
+        assertDailyRotateFile(transports.failed);
       },
       "should enter noop failed state": function () {
-        helpers.assertFailedTransport(failedDailyRotateFileTransport);
+        helpers.assertFailedTransport(transports.failed);
       }
     },
     "when passed a valid file stream": {
       "should have the proper methods defined": function () {
-        helpers.assertDailyRotateFile(streamTransport);
+        assertDailyRotateFile(transports.stream);
       },
-      "the log() method": helpers.testNpmLevels(streamTransport, "should respond with true", function (ign, err, logged) {
+      "the log() method": helpers.testNpmLevels(transports.stream, "should respond with true", function (ign, err, logged) {
         assert.isNull(err);
         assert.isTrue(logged);
       })
@@ -72,8 +74,8 @@ vows.describe('winston/transports/daily-rotate-file').addBatch({
     }
   }
 }).addBatch({
-  "An instance of the Daily Rotate File Transport": transport(winston.transports.DailyRotateFile, {
-    filename: path.join(__dirname, '..', 'fixtures', 'logs', 'testfile.log'),
+  "An instance of the Daily Rotate File Transport": transportTestSuite(DailyRotateFile, {
+    filename: path.join(fixturesDir, 'testfile.log'),
     datePattern: '.2012-12-18'
   })
 }).export(module);

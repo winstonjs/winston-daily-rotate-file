@@ -10,8 +10,8 @@ var events = require('events'),
     fs = require('fs'),
     path = require('path'),
     util = require('util'),
-    common = require('../common'),
-    Transport = require('./transport').Transport,
+    common = require('winston/lib/winston/common'),
+    Transport = require('winston').Transport,
     Stream = require('stream').Stream,
     os = require('os');
 
@@ -21,7 +21,7 @@ var events = require('events'),
 // Constructor function for the DailyRotateFile transport object responsible
 // for persisting log messages and metadata to one or more files.
 //
-var DailyRotateFile = exports.DailyRotateFile = function (options) {
+var DailyRotateFile = module.exports = function (options) {
   Transport.call(this, options);
 
   //
