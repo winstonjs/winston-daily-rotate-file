@@ -23,3 +23,6 @@ Valid meta characters in the datePattern are:
 * __mm:__ The zero padded minute.
 
 *Metadata:* Logged via util.inspect(meta);
+
+##### LICENSE: MIT
+##### AUTHOR: [Charlie Robbins](https://github.com/indexzero)
