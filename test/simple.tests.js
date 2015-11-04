@@ -12,8 +12,8 @@ var path = require('path'),
     assert = require('assert'),
     winston = require('winston'),
     helpers = require('winston/test/helpers'),
-    DailyRotateFile = require('../');
-
+    DailyRotateFile = require('../'),
+    getFormattedDate = require('./helpers/getFormattedDate');
 
 function assertDailyRotateFile(transport) {
   assert.instanceOf(transport, DailyRotateFile);
@@ -32,7 +32,11 @@ var transports = {
   failed: new DailyRotateFile({
     filename: path.join(fixturesDir, 'dir404', 'testfile.log')
   }),
-  stream: new DailyRotateFile({ stream: stream })
+  stream: new DailyRotateFile({ stream: stream }),
+  minutely: new DailyRotateFile({
+    filename: path.join(fixturesDir, 'correctfile.log'),
+    datePattern: '.yyyyMMddHHmm'
+  })
 };
 
 vows.describe('winston/transports/daily-rotate-file').addBatch({
@@ -78,4 +82,38 @@ vows.describe('winston/transports/daily-rotate-file').addBatch({
     filename: path.join(fixturesDir, 'testfile.log'),
     datePattern: '.2012-12-18'
   })
+}).addBatch({
+  "An instance of the Daily Rotate File Transport": {
+    "when the file currently pointing was removed and time has been passing": {
+      topic: function() {
+
+        var self = this;
+        var minutely = transports.minutely;
+        // log into the current file
+        minutely.log('info', 'old log');
+        var timestamp = new Date();
+        var oldTimestamp = getFormattedDate('.yyyyMMddHHmm', timestamp);
+        setTimeout(function() {
+          // remove the current file
+          fs.unlinkSync(path.join(fixturesDir, 'correctfile.log' + oldTimestamp));
+          setTimeout(function() {
+            // wait for a minute and log something
+            minutely.log('info', 'new log');
+            var newTimestamp = getFormattedDate('.yyyyMMddHHmm', new Date());
+            setTimeout(function() {
+              fs.stat(path.join(fixturesDir, 'correctfile.log' + newTimestamp), self.callback);
+            }, 200);
+          }, (60 - timestamp.getSeconds() + 1) * 1000);
+        }, 200);
+
+      },
+      "should be logged into the new file": function(err, stat) {
+        // see if the file with new timestamp exists
+        assert.isNull(err);
+        assert.isNotNull(stat);
+        assert.isDefined(stat);
+        assert.isTrue(stat.size > 0);
+      }
+    }
+  }
 }).export(module);
