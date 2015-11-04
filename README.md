@@ -1,13 +1,16 @@
 # winston-daily-rotate-file
+
+### [SEEKING NEW MAINTAINER][maintainer-issue]
+
+**I will be continuing work on `winston` itself with gusto, but do not plan on spending cycles on maintaining this transport. This was the primary motivation for breaking it out from the core in `winston@2.0.0`. If you are interested please let me know in the [tracking Github issue][maintainer-issue].**
+
+## Usage
+
 A transport for winston which logs to a rotating file each day.
 
 ``` js
   winston.add(require('winston-daily-rotate-file'), options)
 ```
-
-### [SEEKING NEW MAINTAINER][maintainer-issue]
-
-I will be continuing work on `winston` itself with gusto, but do not plan on spending cycles on maintaining this transport. This was the primary motivation for breaking it out from the core in `winston@2.0.0`. If you are interested please let me know in the [tracking Github issue][maintainer-issue].
 
 The DailyRotateFile transport can rotate files by minute, hour, day, month or year. Its options are identical to the File transport with the lone addition of the 'datePattern' option:
 
