@@ -1,9 +1,0 @@
-{"level":"error","message":"test message","timestamp":"2015-11-04T06:56:32.844Z"}
-{"level":"warn","message":"test message","timestamp":"2015-11-04T06:56:32.845Z"}
-{"level":"info","message":"test message","timestamp":"2015-11-04T06:56:32.845Z"}
-{"level":"verbose","message":"test message","timestamp":"2015-11-04T06:56:32.845Z"}
-{"level":"debug","message":"test message","timestamp":"2015-11-04T06:56:32.845Z"}
-{"level":"silly","message":"test message","timestamp":"2015-11-04T06:56:32.845Z"}
-{"metadata":true,"level":"info","message":"test message","timestamp":"2015-11-04T06:56:32.845Z"}
-{"meta":"metadata","level":"info","message":"test message","timestamp":"2015-11-04T06:56:32.845Z"}
-{"metadata":{"$ref":"$"},"level":"info","message":"test message","timestamp":"2015-11-04T06:56:32.845Z"}
