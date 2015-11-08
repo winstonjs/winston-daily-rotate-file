@@ -135,6 +135,12 @@ var DailyRotateFile = module.exports = function (options) {
 //
 util.inherits(DailyRotateFile, Transport);
 
+/**
+ * Define a getter so that `winston.transports.DailyRotateFile`
+ * is available and thus backwards compatible.
+ */
+winston.transports.DailyRotateFile = DailyRotateFile;
+
 //
 // Expose the name of this Transport on the prototype
 //
