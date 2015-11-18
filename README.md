@@ -31,6 +31,21 @@ Valid meta characters in the datePattern are:
 
 *Metadata:* Logged via util.inspect(meta);
 
+## Restrict to specific level
+
+Use boolean flag __restrictToLevel__ so you could create a lgo of only the specified level, default is false
+example:
+``` js
+  new (winstonFileRotator)({
+		name: 'info-log',
+		filename: "info.log",
+		level: 'info',
+		restrictToLevel : true
+	})
+```
+This will only write *info* log records to the file (no *warn* or *error* records will apear...)
+
+
 ##### LICENSE: MIT
 ##### AUTHOR: [Charlie Robbins](https://github.com/indexzero)
 
