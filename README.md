@@ -33,7 +33,7 @@ Valid meta characters in the datePattern are:
 
 ## Restrict to specific level
 
-Use boolean flag __restrictToLevel__ so you could create a lgo of only the specified level, default is false
+Use boolean flag __restrictToLevel__ so you could create a log of only the specified level, default is false
 example:
 ``` js
   new (winstonFileRotator)({
