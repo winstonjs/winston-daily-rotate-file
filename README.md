@@ -36,7 +36,7 @@ Valid meta characters in the datePattern are:
 Use boolean flag __restrictToLevel__ so you could create a log of only the specified level, default is false
 example:
 ``` js
-  new (winstonFileRotator)({
+  new (require('winston-daily-rotate-file'))({
 		name: 'info-log',
 		filename: "info.log",
 		level: 'info',
