@@ -80,6 +80,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.depth       = options.depth       || null;
   this.eol         = options.eol || os.EOL;
   this.maxRetries  = options.maxRetries || 2;
+  this.restrictToLevel   = options.restrictToLevel != null ? options.restrictToLevel : false;
 
   if (this.json) {
     this.stringify = options.stringify;
@@ -150,6 +151,10 @@ DailyRotateFile.prototype.name = 'dailyRotateFile';
 //
 DailyRotateFile.prototype.log = function (level, msg, meta, callback) {
   if (this.silent) {
+    return callback(null, true);
+  }
+  
+  if( this.restrictToLevel && level != this.level){
     return callback(null, true);
   }
 
