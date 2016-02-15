@@ -553,10 +553,12 @@ DailyRotateFile.prototype._createStream = function () {
 // in the case that log filesizes are being capped.
 //
 DailyRotateFile.prototype._getFile = function (inc) {
+  var ext = path.extname(this._basename),
+  	  basename = path.basename(this._basename, ext);
   var self = this,
-      filename = this._basename + this.getFormattedDate(),
+      filename = basename + this.getFormattedDate()+ext,
       remaining;
-
+ 
   if (inc) {
     //
     // Increment the number of files created or
@@ -577,7 +579,7 @@ DailyRotateFile.prototype._getFile = function (inc) {
   }
 
   return this._created
-    ? filename + '.' + this._created
+    ? basename + this.getFormattedDate() + '.' + this._created +  ext
     : filename;
 };
 
