@@ -1,6 +1,6 @@
 # winston-daily-rotate-file
 
-[![NPM](https://nodei.co/npm/winston-daily-rotate-file.png?downloads=true&downloadRank=true&stars=true](https://www.npmjs.com/package/winston-daily-rotate-file/)
+[![NPM](https://nodei.co/npm/winston-daily-rotate-file.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/winston-daily-rotate-file/)
 
 [![Circle CI](https://circleci.com/gh/winstonjs/winston-daily-rotate-file.svg?style=shield)](https://circleci.com/gh/winstonjs/winston-daily-rotate-file)
 [![devDependency Status](https://david-dm.org/winstonjs/winston-daily-rotate-file.svg)](https://david-dm.org/winstonjs/winston-daily-rotate-file#info=devDependencies)
