@@ -68,42 +68,11 @@ winston.transports.DailyRotateFile = DailyRotateFile;
 //
 DailyRotateFile.prototype.name = 'dailyRotateFile';
 
-DailyRotateFile.prototype._getFile = function() {
-  var filename = this._getFilename(),
-      ext = path.extname(filename),
-      basename = path.basename(filename, ext);
-
-  //
-  // Caveat emptor (indexzero): rotationFormat() was broken by design
-  // when combined with max files because the set of files to unlink
-  // is never stored.
-  //
-  return !this.tailable && this._created
-    ? basename + (this.rotationFormat ? this.rotationFormat() : this._created) + ext
-    : basename + ext;
-};
-
-DailyRotateFile.prototype._incFile = function (callback) {
-  var filename = this._getFilename(),
-      ext = path.extname(filename),
-      basename = path.basename(filename, ext),
-      oldest,
-      target;
-
-  if (!this.tailable) {
-    this._created += 1;
-    this._checkMaxFilesIncrementing(ext, basename, callback);
-  }
-  else {
-    this._checkMaxFilesTailable(ext, basename, callback);
-  }
-};
-
 //
 // ### @private function _getFilename ()
 // Returns the log filename depending on `this.prepend` option value
 //
-DailyRotateFile.prototype._getFilename = function () {
+File.prototype._getFilename = function () {
   var formattedDate = this.getFormattedDate();
 
   if (this.prepend) {
