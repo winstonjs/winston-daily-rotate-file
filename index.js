@@ -81,6 +81,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.depth       = options.depth       || null;
   this.eol         = options.eol || os.EOL;
   this.maxRetries  = options.maxRetries || 2;
+  this.prepend     = options.prepend     || false;
 
   if (this.json) {
     this.stringify = options.stringify;
@@ -246,7 +247,7 @@ DailyRotateFile.prototype.query = function (options, callback) {
   }
 
   // TODO when maxfilesize rotate occurs
-  var file = path.join(this.dirname, this._basename + this.getFormattedDate()),
+  var file = path.join(this.dirname, this._getFilename()),
       options = this.normalizeQuery(options),
       buff = '',
       results = [],
@@ -340,7 +341,7 @@ DailyRotateFile.prototype.query = function (options, callback) {
 // Returns a log stream for this transport. Options object is optional.
 //
 DailyRotateFile.prototype.stream = function (options) {
-  var file = path.join(this.dirname, this._basename + this.getFormattedDate()),
+  var file = path.join(this.dirname, this._getFilename()),
       options = options || {},
       stream = new Stream;
 
@@ -561,7 +562,7 @@ DailyRotateFile.prototype._createStream = function () {
 //
 DailyRotateFile.prototype._getFile = function (inc) {
   var self = this,
-      filename = this._basename + this.getFormattedDate(),
+      filename = this._getFilename(),
       remaining;
 
   if (inc) {
@@ -586,6 +587,20 @@ DailyRotateFile.prototype._getFile = function (inc) {
   return this._created
     ? filename + '.' + this._created
     : filename;
+};
+
+//
+// ### @private function _getFilename ()
+// Returns the log filename depending on `this.prepend` option value
+//
+DailyRotateFile.prototype._getFilename = function () {
+  var formattedDate = this.getFormattedDate();
+
+  if (this.prepend) {
+    return formattedDate + this._basename;
+  }
+
+  return this._basename + formattedDate;
 };
 
 //
