@@ -1,8 +1,7 @@
 # winston-daily-rotate-file
+A transport for winston which logs to a rotating file each day.
 
 ## Usage
-
-A transport for winston which logs to a rotating file each day.
 
 ``` js
   winston.add(require('winston-daily-rotate-file'), options)
