@@ -1,9 +1,5 @@
 # winston-daily-rotate-file
 
-### [SEEKING NEW MAINTAINER][maintainer-issue]
-
-**I will be continuing work on `winston` itself with gusto, but do not plan on spending cycles on maintaining this transport. This was the primary motivation for breaking it out from the core in `winston@2.0.0`. If you are interested please let me know in the [tracking Github issue][maintainer-issue].**
-
 ## Usage
 
 A transport for winston which logs to a rotating file each day.
@@ -33,5 +29,4 @@ Valid meta characters in the datePattern are:
 
 ##### LICENSE: MIT
 ##### AUTHOR: [Charlie Robbins](https://github.com/indexzero)
-
-[maintainer-issue]: https://github.com/winstonjs/winston-daily-rotate-file/issues/5
+##### MAINTAINER: [Matt Berther](https://github.com/mattberther)
