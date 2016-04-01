@@ -99,11 +99,11 @@ var DailyRotateFile = module.exports = function (options) {
   this._failures = 0;
 
   var now = new Date();
-  this._year   = now.getFullYear();
-  this._month  = now.getMonth();
-  this._date   = now.getDate();
-  this._hour   = now.getHours();
-  this._minute = now.getMinutes();
+  this._year   = now.getUTCFullYear();
+  this._month  = now.getUTCMonth();
+  this._date   = now.getUTCDate();
+  this._hour   = now.getUTCHours();
+  this._minute = now.getUTCMinutes();
 
   var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhM])\1?/g,
       pad = function (val, len) {
@@ -389,7 +389,7 @@ DailyRotateFile.prototype.open = function (callback) {
     return callback(true);
   }
   else if (!this._stream || (this.maxsize && this._size >= this.maxsize) ||
-      (this._year < now.getFullYear() || this._month < now.getMonth() || this._date < now.getDate() || this._hour < now.getHours() || this._minute < now.getMinutes())) {
+      (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours() || this._minute < now.getUTCMinutes())) {
     //
     // If we dont have a stream or have exceeded our size, then create
     // the next stream and respond with a value indicating that
@@ -540,12 +540,12 @@ DailyRotateFile.prototype._createStream = function () {
       }
 
       var now = new Date();
-      if (self._year < now.getFullYear() || self._month < now.getMonth() || self._date < now.getDate() || self._hour < now.getHours() || self._minute < now.getMinutes()) {
-        self._year   = now.getFullYear();
-        self._month  = now.getMonth();
-        self._date   = now.getDate();
-        self._hour   = now.getHours();
-        self._minute = now.getMinutes();
+      if (self._year < now.getUTCFullYear() || self._month < now.getUTCMonth() || self._date < now.getUTCDate() || self._hour < now.getUTCHours() || self._minute < now.getUTCMinutes()) {
+        self._year   = now.getUTCFullYear();
+        self._month  = now.getUTCMonth();
+        self._date   = now.getUTCDate();
+        self._hour   = now.getUTCHours();
+        self._minute = now.getUTCMinutes();
         self._created  = 0;
         return checkFile(self._getFile());
       }
