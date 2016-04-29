@@ -13,7 +13,7 @@ var events = require('events'),
     common = require('winston/lib/winston/common'),
     Transport = require('winston').Transport,
     Stream = require('stream').Stream,
-    os = require('os')
+    os = require('os'),
     winston = require('winston');
 
 //
