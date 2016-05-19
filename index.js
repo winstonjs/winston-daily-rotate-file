@@ -6,15 +6,14 @@
  *
  */
 
-var events = require('events'),
-    fs = require('fs'),
-    path = require('path'),
-    util = require('util'),
-    common = require('winston/lib/winston/common'),
-    Transport = require('winston').Transport,
-    Stream = require('stream').Stream,
-    os = require('os'),
-    winston = require('winston');
+var fs = require('fs');
+var path = require('path');
+var util = require('util');
+var common = require('winston/lib/winston/common');
+var Transport = require('winston').Transport;
+var Stream = require('stream').Stream;
+var os = require('os');
+var winston = require('winston');
 
 //
 // ### function DailyRotateFile (options)
@@ -29,7 +28,7 @@ var DailyRotateFile = module.exports = function (options) {
   // Helper function which throws an `Error` in the event
   // that any of the rest of the arguments is present in `options`.
   //
-  function throwIf (target /*, illegal... */) {
+  function throwIf(target /* , illegal... */) {
     Array.prototype.slice.call(arguments, 1).forEach(function (name) {
       if (options[name]) {
         throw new Error('Cannot set ' + name + ' and ' + target + 'together');
@@ -39,22 +38,22 @@ var DailyRotateFile = module.exports = function (options) {
 
   if (options.filename || options.dirname) {
     throwIf('filename or dirname', 'stream');
-    this._basename = this.filename = options.filename
-      ? path.basename(options.filename)
-      : 'winston.log';
+    this._basename = this.filename = options.filename ?
+      path.basename(options.filename) :
+      'winston.log';
 
-    this.dirname   = options.dirname || path.dirname(options.filename);
-    this.options   = options.options || { flags: 'a' };
+    this.dirname = options.dirname || path.dirname(options.filename);
+    this.options = options.options || {flags: 'a'};
 
     //
     // "24 bytes" is maybe a good value for logging lines.
     //
     this.options.highWaterMark = this.options.highWaterMark || 24;
-  }
-  else if (options.stream) {
+  } else if (options.stream) {
     throwIf('stream', 'filename', 'maxsize');
     this._stream = options.stream;
-    this._stream.on('error', function(error){
+    var self = this;
+    this._stream.on('error', function (error) {
       self.emit('error', error);
     });
 
@@ -64,24 +63,23 @@ var DailyRotateFile = module.exports = function (options) {
     // mad at times.
     //
     this._stream.setMaxListeners(Infinity);
-  }
-  else {
+  } else {
     throw new Error('Cannot log to file without filename or stream.');
   }
 
-  this.json        = options.json !== false;
-  this.colorize    = options.colorize    || false;
-  this.maxsize     = options.maxsize     || null;
-  this.maxFiles    = options.maxFiles    || null;
-  this.label       = options.label       || null;
+  this.json = options.json !== false;
+  this.colorize = options.colorize || false;
+  this.maxsize = options.maxsize || null;
+  this.maxFiles = options.maxFiles || null;
+  this.label = options.label || null;
   this.prettyPrint = options.prettyPrint || false;
-  this.showLevel   = options.showLevel === undefined ? true : options.showLevel;
-  this.timestamp   = options.timestamp != null ? options.timestamp : true;
-  this.datePattern = options.datePattern != null ? options.datePattern : '.yyyy-MM-dd';
-  this.depth       = options.depth       || null;
-  this.eol         = options.eol || os.EOL;
-  this.maxRetries  = options.maxRetries || 2;
-  this.prepend     = options.prepend     || false;
+  this.showLevel = options.showLevel === undefined ? true : options.showLevel;
+  this.timestamp = options.timestamp ? options.timestamp : true;
+  this.datePattern = options.datePattern ? options.datePattern : '.yyyy-MM-dd';
+  this.depth = options.depth || null;
+  this.eol = options.eol || os.EOL;
+  this.maxRetries = options.maxRetries || 2;
+  this.prepend = options.prepend || false;
 
   if (this.json) {
     this.stringify = options.stringify;
@@ -92,39 +90,41 @@ var DailyRotateFile = module.exports = function (options) {
   // of files this instance has created and the current
   // size (in bytes) of the current logfile.
   //
-  this._size     = 0;
-  this._created  = 0;
-  this._buffer   = [];
+  this._size = 0;
+  this._created = 0;
+  this._buffer = [];
   this._draining = false;
   this._failures = 0;
 
   var now = new Date();
-  this._year   = now.getUTCFullYear();
-  this._month  = now.getUTCMonth();
-  this._date   = now.getUTCDate();
-  this._hour   = now.getUTCHours();
+  this._year = now.getUTCFullYear();
+  this._month = now.getUTCMonth();
+  this._date = now.getUTCDate();
+  this._hour = now.getUTCHours();
   this._minute = now.getUTCMinutes();
 
-  var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhM])\1?/g,
-      pad = function (val, len) {
-              val = String(val);
-              len = len || 2;
-              while (val.length < len) val = "0" + val;
-              return val;
-      };
+  var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhM])\1?/g;
+  var pad = function (val, len) {
+    val = String(val);
+    len = len || 2;
+    while (val.length < len) {
+      val = '0' + val;
+    }
+    return val;
+  };
 
-  this.getFormattedDate = function() {
+  this.getFormattedDate = function () {
     var flags = {
-      yy:   String(this._year).slice(2),
+      yy: String(this._year).slice(2),
       yyyy: this._year,
-      M:    this._month + 1,
-      MM:   pad(this._month + 1),
-      d:    this._date,
-      dd:   pad(this._date),
-      H:    this._hour,
-      HH:   pad(this._hour),
-      m:    this._minute,
-      mm:   pad(this._minute)
+      M: this._month + 1,
+      MM: pad(this._month + 1),
+      d: this._date,
+      dd: pad(this._date),
+      H: this._hour,
+      HH: pad(this._hour),
+      m: this._minute,
+      mm: pad(this._minute)
     };
     return this.datePattern.replace(token, function ($0) {
       return $0 in flags ? flags[$0] : $0.slice(1, $0.length - 1);
@@ -173,33 +173,24 @@ DailyRotateFile.prototype.log = function (level, msg, meta, callback) {
   var self = this;
 
   var output = common.log({
-    level:       level,
-    message:     msg,
-    meta:        meta,
-    json:        this.json,
-    colorize:    this.colorize,
+    level: level,
+    message: msg,
+    meta: meta,
+    json: this.json,
+    colorize: this.colorize,
     prettyPrint: this.prettyPrint,
-    timestamp:   this.timestamp,
-    label:       this.label,
-    stringify:   this.stringify,
-    showLevel:   this.showLevel,
-    depth:       this.depth,
-    formatter:   this.formatter,
+    timestamp: this.timestamp,
+    label: this.label,
+    stringify: this.stringify,
+    showLevel: this.showLevel,
+    depth: this.depth,
+    formatter: this.formatter,
     humanReadableUnhandledException: this.humanReadableUnhandledException
   }) + this.eol;
 
   this._size += output.length;
 
-  if (!this.filename) {
-    //
-    // If there is no `filename` on this instance then it was configured
-    // with a raw `WriteableStream` instance and we should not perform any
-    // size restrictions.
-    //
-    this._write(output, callback);
-    this._lazyDrain();
-  }
-  else {
+  if (this.filename) {
     this.open(function (err) {
       if (err) {
         //
@@ -211,6 +202,14 @@ DailyRotateFile.prototype.log = function (level, msg, meta, callback) {
       self._write(output, callback);
       self._lazyDrain();
     });
+  } else {
+    //
+    // If there is no `filename` on this instance then it was configured
+    // with a raw `WriteableStream` instance and we should not perform any
+    // size restrictions.
+    //
+    this._write(output, callback);
+    this._lazyDrain();
   }
 };
 
@@ -220,14 +219,17 @@ DailyRotateFile.prototype.log = function (level, msg, meta, callback) {
 // #### @cb {function} Continuation to respond to when complete.
 // Write to the stream, ensure execution of a callback on completion.
 //
-DailyRotateFile.prototype._write = function(data, callback) {
+DailyRotateFile.prototype._write = function (data, callback) {
   // If this is a file write stream, we could use the builtin
   // callback functionality, however, the stream is not guaranteed
   // to be an fs.WriteStream.
   var ret = this._stream.write(data);
-  if (!callback) return;
+  if (!callback) {
+    return;
+  }
+
   if (ret === false) {
-    return this._stream.once('drain', function() {
+    return this._stream.once('drain', function () {
       callback(null, true);
     });
   }
@@ -247,11 +249,11 @@ DailyRotateFile.prototype.query = function (options, callback) {
   }
 
   // TODO when maxfilesize rotate occurs
-  var file = path.join(this.dirname, this._getFilename()),
-      options = this.normalizeQuery(options),
-      buff = '',
-      results = [],
-      row = 0;
+  var file = path.join(this.dirname, this._getFilename());
+  options = this.normalizeQuery(options);
+  var buff = '';
+  var results = [];
+  var row = 0;
 
   var stream = fs.createReadStream(file, {
     encoding: 'utf8'
@@ -261,16 +263,16 @@ DailyRotateFile.prototype.query = function (options, callback) {
     if (stream.readable) {
       stream.destroy();
     }
-    if (!callback) return;
-    return err.code !== 'ENOENT'
-      ? callback(err)
-      : callback(null, results);
+    if (!callback) {
+      return;
+    }
+    return err.code === 'ENOENT' ? callback(null, results) : callback(err);
   });
 
   stream.on('data', function (data) {
-    var data = (buff + data).split(/\n+/),
-        l = data.length - 1,
-        i = 0;
+    data = (buff + data).split(/\n+/);
+    var l = data.length - 1;
+    var i = 0;
 
     for (; i < l; i++) {
       if (!options.start || row >= options.start) {
@@ -283,17 +285,23 @@ DailyRotateFile.prototype.query = function (options, callback) {
   });
 
   stream.on('close', function () {
-    if (buff) add(buff, true);
+    if (buff) {
+      add(buff, true);
+    }
     if (options.order === 'desc') {
       results = results.reverse();
     }
-    if (callback) callback(null, results);
+    if (callback) {
+      callback(null, results);
+    }
   });
 
   function add(buff, attempt) {
     try {
       var log = JSON.parse(buff);
-      if (check(log)) push(log);
+      if (check(log)) {
+        push(log);
+      }
     } catch (e) {
       if (!attempt) {
         stream.emit('error', e);
@@ -321,13 +329,17 @@ DailyRotateFile.prototype.query = function (options, callback) {
   }
 
   function check(log) {
-    if (!log) return;
+    if (!log) {
+      return;
+    }
 
-    if (typeof log !== 'object') return;
+    if (typeof log !== 'object') {
+      return;
+    }
 
     var time = new Date(log.timestamp);
-    if ((options.from && time < options.from)
-        || (options.until && time > options.until)) {
+    if ((options.from && time < options.from) ||
+      (options.until && time > options.until)) {
       return;
     }
 
@@ -341,9 +353,9 @@ DailyRotateFile.prototype.query = function (options, callback) {
 // Returns a log stream for this transport. Options object is optional.
 //
 DailyRotateFile.prototype.stream = function (options) {
-  var file = path.join(this.dirname, this._getFilename()),
-      options = options || {},
-      stream = new Stream;
+  var file = path.join(this.dirname, this._getFilename());
+  options = options || {};
+  var stream = new Stream();
 
   var tail = {
     file: file,
@@ -351,9 +363,8 @@ DailyRotateFile.prototype.stream = function (options) {
   };
 
   stream.destroy = common.tailFile(tail, function (err, line) {
-
-    if(err){
-      return stream.emit('error',err);
+    if (err) {
+      return stream.emit('error', err);
     }
 
     try {
@@ -365,7 +376,7 @@ DailyRotateFile.prototype.stream = function (options) {
     }
   });
 
-  if(stream.resume){
+  if (stream.resume) {
     stream.resume();
   }
 
@@ -387,8 +398,7 @@ DailyRotateFile.prototype.open = function (callback) {
     // that the message should be buffered.
     //
     return callback(true);
-  }
-  else if (!this._stream || (this.maxsize && this._size >= this.maxsize) ||
+  } else if (!this._stream || (this.maxsize && this._size >= this.maxsize) ||
       (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours() || this._minute < now.getUTCMinutes())) {
     //
     // If we dont have a stream or have exceeded our size, then create
@@ -436,8 +446,8 @@ DailyRotateFile.prototype.flush = function () {
   // and then write them to the newly created stream.
   //
   this._buffer.forEach(function (item) {
-    var str = item[0],
-        callback = item[1];
+    var str = item[0];
+    var callback = item[1];
 
     process.nextTick(function () {
       self._write(str, callback);
@@ -470,14 +480,14 @@ DailyRotateFile.prototype._createStream = function () {
   var self = this;
   this.opening = true;
 
-  (function checkFile (target) {
+  (function checkFile(target) {
     var fullname = path.join(self.dirname, target);
 
     //
     // Creates the `WriteStream` and then flushes any
     // buffered messages.
     //
-    function createAndFlush (size) {
+    function createAndFlush(size) {
       if (self._stream) {
         self._stream.end();
         self._stream.destroySoon();
@@ -486,12 +496,11 @@ DailyRotateFile.prototype._createStream = function () {
       self._size = size;
       self.filename = target;
       self._stream = fs.createWriteStream(fullname, self.options);
-      self._stream.on('error', function(error){
+      self._stream.on('error', function (error) {
         if (self._failures < self.maxRetries) {
           self._createStream();
           self._failures++;
-        }
-        else {
+        } else {
           self.emit('error', error);
         }
       });
@@ -541,12 +550,12 @@ DailyRotateFile.prototype._createStream = function () {
 
       var now = new Date();
       if (self._year < now.getUTCFullYear() || self._month < now.getUTCMonth() || self._date < now.getUTCDate() || self._hour < now.getUTCHours() || self._minute < now.getUTCMinutes()) {
-        self._year   = now.getUTCFullYear();
-        self._month  = now.getUTCMonth();
-        self._date   = now.getUTCDate();
-        self._hour   = now.getUTCHours();
+        self._year = now.getUTCFullYear();
+        self._month = now.getUTCMonth();
+        self._date = now.getUTCDate();
+        self._hour = now.getUTCHours();
         self._minute = now.getUTCMinutes();
-        self._created  = 0;
+        self._created = 0;
         return checkFile(self._getFile());
       }
 
@@ -561,9 +570,8 @@ DailyRotateFile.prototype._createStream = function () {
 // in the case that log filesizes are being capped.
 //
 DailyRotateFile.prototype._getFile = function (inc) {
-  var self = this,
-      filename = this._getFilename(),
-      remaining;
+  var filename = this._getFilename();
+  var remaining;
 
   if (inc) {
     //
@@ -575,8 +583,7 @@ DailyRotateFile.prototype._getFile = function (inc) {
       remaining = this._created - (this.maxFiles - 1);
       if (remaining === 0) {
         fs.unlinkSync(path.join(this.dirname, filename));
-      }
-      else {
+      } else {
         fs.unlinkSync(path.join(this.dirname, filename + '.' + remaining));
       }
     }
@@ -584,9 +591,7 @@ DailyRotateFile.prototype._getFile = function (inc) {
     this._created += 1;
   }
 
-  return this._created
-    ? filename + '.' + this._created
-    : filename;
+  return this._created ? filename + '.' + this._created : filename;
 };
 
 //
