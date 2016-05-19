@@ -1,12 +1,8 @@
 # winston-daily-rotate-file
 
-[![NPM](https://nodei.co/npm/winston-daily-rotate-file.png?downloads=true&downloadRank=true&stars=true)](https://www.npmjs.com/package/winston-daily-rotate-file/)
+[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 
-[![Circle CI](https://circleci.com/gh/winstonjs/winston-daily-rotate-file.svg?style=shield)](https://circleci.com/gh/winstonjs/winston-daily-rotate-file)
-[![devDependency Status](https://david-dm.org/winstonjs/winston-daily-rotate-file.svg)](https://david-dm.org/winstonjs/winston-daily-rotate-file#info=devDependencies)
-
-
-A transport for winston which logs to a rotating file each day.
+> A transport for winston which logs to a rotating file each day.
 
 ## Usage
 
@@ -34,6 +30,15 @@ Valid meta characters in the datePattern are:
 
 *Metadata:* Logged via util.inspect(meta);
 
-##### LICENSE: MIT
+## LICENSE
+MIT
+
 ##### AUTHOR: [Charlie Robbins](https://github.com/indexzero)
 ##### MAINTAINER: [Matt Berther](https://github.com/mattberther)
+
+[npm-image]: https://badge.fury.io/js/winston-daily-rotate-file.svg
+[npm-url]: https://npmjs.org/package/winston-daily-rotate-file
+[travis-image]: https://travis-ci.org/winstonjs/winston-daily-rotate-file.svg?branch=master
+[travis-url]: https://travis-ci.org/winstonjs/winston-daily-rotate-file
+[daviddm-image]: https://david-dm.org/winstonjs/winston-daily-rotate-file.svg?theme=shields.io
+[daviddm-url]: https://david-dm.org/winstonjs/winston-daily-rotate-file
