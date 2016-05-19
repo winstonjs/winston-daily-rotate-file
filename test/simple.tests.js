@@ -1,11 +1,4 @@
 /* eslint-disable max-nested-callbacks,no-unused-expressions */
-/*
- * file-test.js: Tests for instances of the Daily Rotate File transport
- *
- * (C) 2010 Charlie Robbins
- * MIT LICENSE
- *
- */
 
 var path = require('path');
 var expect = require('chai').expect;

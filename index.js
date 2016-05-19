@@ -1,10 +1,3 @@
-/*
- * daily-rotate-file.js: Transport for outputting to a local log file
- *
- * (C) 2010 Charlie Robbins
- * MIT LICENCE
- *
- */
 
 var fs = require('fs');
 var path = require('path');
