@@ -1,4 +1,4 @@
-var Stream = require('readable-stream');
+var Stream = require('stream');
 var util = require('util');
 
 module.exports = WritableStream;
