@@ -1,4 +1,5 @@
 /* eslint-disable max-nested-callbacks,no-unused-expressions */
+'use strict';
 
 var path = require('path');
 var expect = require('chai').expect;
