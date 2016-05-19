@@ -20,20 +20,6 @@ var fixturesDir = path.join(__dirname, 'fixtures');
 rimraf.sync(fixturesDir);
 mkdirp(fixturesDir);
 
-// var stream = fs.createWriteStream(path.join(fixturesDir, 'testfile.log.2012-12-18'));
-// var streamPrepended = fs.createWriteStream(path.join(fixturesDir, '2015-03-21_testfile.log'));
-/*
-var transports = {
-  stream: new DailyRotateFile({ stream: stream }),
-  prepended: new DailyRotateFile({
-    filename: path.join(fixturesDir, 'testfilename.log'),
-    datePattern: 'yyyy-MM-dd_',
-    prepend: true
-  }),
-  streamPrepended: new DailyRotateFile({ stream: streamPrepended })
-};
-*/
-
 var transports = {
   'file': new DailyRotateFile({
     filename: path.join(fixturesDir, 'testfilename.log'),
@@ -125,39 +111,3 @@ describe('winston/transports/daily-rotate-file', function () {
     });
   });
 });
-/*
-  "An instance of the Daily Rotate File Transport with 'prepend' option": {
-   "when passed a valid filename": {
-      "the log() method": helpers.testNpmLevels(transports.prepended, "should respond with true", function (ign, err, logged) {
-        assert.isNull(err);
-        assert.isTrue(logged);
-      })
-    },
-    "when passed a valid file stream": {
-      "the log() method": helpers.testNpmLevels(transports.streamPrepended, "should respond with true", function (ign, err, logged) {
-        assert.isNull(err);
-        assert.isTrue(logged);
-      })
-    }
-  }
-}).addBatch({
-  "These tests have a non-deterministic end": {
-    topic: function () {
-      setTimeout(this.callback, 200);
-    },
-    "and this should be fixed before releasing": function () {
-      assert.isTrue(true);
-    }
-  }
-}).addBatch({
-  "An instance of the Daily Rotate File Transport": transportTestSuite(DailyRotateFile, {
-    filename: path.join(fixturesDir, 'testfile.log'),
-    datePattern: '.2012-12-18'
-  }),
-  "An instance of the Daily Rotate File Transport with 'prepend' option": transportTestSuite(DailyRotateFile, {
-    filename: path.join(fixturesDir, 'testfile.log'),
-    datePattern: '2015-03-21_',
-    prepend: true
-  })
-}).export(module);
-*/
