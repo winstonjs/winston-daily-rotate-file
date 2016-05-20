@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha && eslint .",
-    "publish-major": "npm version major && npm publish && git push origin master && git push --tags",
-    "publish-minor": "npm version minor && npm publish && git push origin master && git push --tags",
-    "publish-patch": "npm version patch && npm publish && git push origin master && git push --tags"
+    "preversion": "npm test",
+    "postversion": "git push && git push --tags && npm publish"
   },
   "repository": {
     "type": "git",
