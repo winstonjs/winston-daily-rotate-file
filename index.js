@@ -489,9 +489,9 @@ DailyRotateFile.prototype._createStream = function () {
 
       // mkdir if options.datePattern contains path delimiter
       if (target.indexOf('/') > -1) {
-        const targetpath = target.split('/');
+        var targetpath = target.split('/');
         for (var i = 1; i < targetpath.length; i++) {
-          const mkdirstep = path.join(self.dirname, targetpath.slice(0, i).join('/'));
+          var mkdirstep = path.join(self.dirname, targetpath.slice(0, i).join('/'));
           try {
             fs.mkdirSync(mkdirstep, '0744');
           } catch (e) {
