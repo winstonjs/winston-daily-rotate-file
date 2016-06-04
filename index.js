@@ -393,7 +393,7 @@ DailyRotateFile.prototype.open = function (callback) {
     //
     return callback(true);
   } else if (!this._stream || (this.maxsize && this._size >= this.maxsize) ||
-      (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours() || this._minute < now.getUTCMinutes())) {
+      this._filenameHasExpired()) {
     //
     // If we dont have a stream or have exceeded our size, then create
     // the next stream and respond with a value indicating that
@@ -548,7 +548,7 @@ DailyRotateFile.prototype._createStream = function () {
       }
 
       var now = new Date();
-      if (self._year < now.getUTCFullYear() || self._month < now.getUTCMonth() || self._date < now.getUTCDate() || self._hour < now.getUTCHours() || self._minute < now.getUTCMinutes()) {
+      if (self._filenameHasExpired()) {
         self._year = now.getUTCFullYear();
         self._month = now.getUTCMonth();
         self._date = now.getUTCDate();
@@ -623,5 +623,49 @@ DailyRotateFile.prototype._lazyDrain = function () {
       this._draining = false;
       self.emit('logged');
     });
+  }
+};
+
+//
+// ### @private function _filenameHasExpired ()
+// Checks whether the current log file is valid
+// based on given datepattern
+//
+DailyRotateFile.prototype._filenameHasExpired = function () {
+  var datePattern = this.datePattern;
+
+  // searching for m is enough to say minute in date pattern
+  if (this.datePattern.match(/m/)) {
+    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours() || this._minute < now.getUTCMinutes()) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (this.datePattern.match(/H/)) {
+    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours())) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (this.datePattern.match(/d/)) {
+    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate())) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (this.datePattern.match(/M/)) {
+    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth())) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (this.datePattern.match(/yy/)) {
+    if (this._year < now.getUTCFullYear()) {
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
   }
 };
