@@ -633,7 +633,8 @@ DailyRotateFile.prototype._lazyDrain = function () {
 //
 DailyRotateFile.prototype._filenameHasExpired = function () {
   var datePattern = this.datePattern;
-
+  var now = new Date();
+  
   // searching for m is enough to say minute in date pattern
   if (this.datePattern.match(/m/)) {
     if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours() || this._minute < now.getUTCMinutes()) {
@@ -642,19 +643,19 @@ DailyRotateFile.prototype._filenameHasExpired = function () {
       return false;
     }
   } else if (this.datePattern.match(/H/)) {
-    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours())) {
+    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours()){
       return true;
     } else {
       return false;
     }
   } else if (this.datePattern.match(/d/)) {
-    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate())) {
+    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate()) {
       return true;
     } else {
       return false;
     }
   } else if (this.datePattern.match(/M/)) {
-    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth())) {
+    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth()) {
       return true;
     } else {
       return false;
