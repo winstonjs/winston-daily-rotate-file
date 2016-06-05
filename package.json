@@ -33,6 +33,7 @@
     "eslint-config-xo-space": "0.13.0",
     "mkdirp": "0.5.1",
     "mocha": "2.4.5",
+    "moment": "2.13.0",
     "rimraf": "2.5.2"
   },
   "eslintConfig": {
