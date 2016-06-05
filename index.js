@@ -644,7 +644,6 @@ DailyRotateFile.prototype._filenameHasExpired = function () {
     return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth());
   } else if (this.datePattern.match(/yy/)) {
     return (this._year < now.getUTCFullYear());
-  } else {
-    return false;
   }
+  return false;
 };
