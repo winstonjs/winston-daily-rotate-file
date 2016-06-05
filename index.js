@@ -384,7 +384,6 @@ DailyRotateFile.prototype.stream = function (options) {
 // (if any) and the current size of the file used.
 //
 DailyRotateFile.prototype.open = function (callback) {
-  var now = new Date();
   if (this.opening) {
     //
     // If we are already attempting to open the next
@@ -632,40 +631,19 @@ DailyRotateFile.prototype._lazyDrain = function () {
 // based on given datepattern
 //
 DailyRotateFile.prototype._filenameHasExpired = function () {
-  var datePattern = this.datePattern;
   var now = new Date();
-  
+
   // searching for m is enough to say minute in date pattern
   if (this.datePattern.match(/m/)) {
-    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours() || this._minute < now.getUTCMinutes()) {
-      return true;
-    } else {
-      return false;
-    }
+    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours() || this._minute < now.getUTCMinutes());
   } else if (this.datePattern.match(/H/)) {
-    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours()){
-      return true;
-    } else {
-      return false;
-    }
+    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours());
   } else if (this.datePattern.match(/d/)) {
-    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate()) {
-      return true;
-    } else {
-      return false;
-    }
+    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate());
   } else if (this.datePattern.match(/M/)) {
-    if (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth()) {
-      return true;
-    } else {
-      return false;
-    }
+    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth());
   } else if (this.datePattern.match(/yy/)) {
-    if (this._year < now.getUTCFullYear()) {
-      return true;
-    } else {
-      return false;
-    }
+    return (this._year < now.getUTCFullYear());
   } else {
     return false;
   }
