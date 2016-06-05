@@ -69,7 +69,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.prettyPrint = options.prettyPrint || false;
   this.showLevel = options.showLevel === undefined ? true : options.showLevel;
   this.timestamp = options.timestamp ? options.timestamp : true;
-  this.datePattern = options.datePattern ? options.datePattern : '.yyyy-MM-dd';
+  this.datePattern = options.datePattern ? options.datePattern : 'yyyy-MM-dd';
   this.depth = options.depth || null;
   this.eol = options.eol || os.EOL;
   this.maxRetries = options.maxRetries || 2;
@@ -601,10 +601,10 @@ DailyRotateFile.prototype._getFilename = function () {
   var formattedDate = this.getFormattedDate();
 
   if (this.prepend) {
-    return formattedDate + this._basename;
+    return [formattedDate, this._basename].join('.');
   }
 
-  return this._basename + formattedDate;
+  return [this._basename, formattedDate].join('.');
 };
 
 //
