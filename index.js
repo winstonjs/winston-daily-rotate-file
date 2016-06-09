@@ -9,6 +9,8 @@ var Stream = require('stream').Stream;
 var os = require('os');
 var winston = require('winston');
 
+var weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 //
 // ### function DailyRotateFile (options)
 // #### @options {Object} Options for this instance.
@@ -70,6 +72,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.showLevel = options.showLevel === undefined ? true : options.showLevel;
   this.timestamp = options.timestamp ? options.timestamp : true;
   this.datePattern = options.datePattern ? options.datePattern : 'yyyy-MM-dd';
+  this.fileSuffix = options.fileSuffix || null;
   this.depth = options.depth || null;
   this.eol = options.eol || os.EOL;
   this.maxRetries = options.maxRetries || 2;
@@ -96,6 +99,7 @@ var DailyRotateFile = module.exports = function (options) {
   this._date = now.getUTCDate();
   this._hour = now.getUTCHours();
   this._minute = now.getUTCMinutes();
+  this._weekday = weekday[now.getUTCDay()];
 
   var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhM])\1?/g;
   var pad = function (val, len) {
@@ -118,7 +122,8 @@ var DailyRotateFile = module.exports = function (options) {
       H: this._hour,
       HH: pad(this._hour),
       m: this._minute,
-      mm: pad(this._minute)
+      mm: pad(this._minute),
+      ddd: this._weekday
     };
     return this.datePattern.replace(token, function ($0) {
       return $0 in flags ? flags[$0] : $0.slice(1, $0.length - 1);
@@ -554,6 +559,7 @@ DailyRotateFile.prototype._createStream = function () {
         self._date = now.getUTCDate();
         self._hour = now.getUTCHours();
         self._minute = now.getUTCMinutes();
+        self._weekday = weekday[now.getUTCDay()];
         self._created = 0;
         return checkFile(self._getFile());
       }
@@ -599,12 +605,18 @@ DailyRotateFile.prototype._getFile = function (inc) {
 //
 DailyRotateFile.prototype._getFilename = function () {
   var formattedDate = this.getFormattedDate();
+  var filenameElements;
 
   if (this.prepend) {
-    return [formattedDate, this._basename].join('.');
+    filenameElements = [formattedDate, this._basename];
+  } else {
+    filenameElements = [this._basename, formattedDate];
+  }
+  if (this.fileSuffix) {
+    filenameElements.push(this.fileSuffix);
   }
 
-  return [this._basename, formattedDate].join('.');
+  return filenameElements.join('.');
 };
 
 //
