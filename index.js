@@ -598,6 +598,10 @@ DailyRotateFile.prototype._getFile = function (inc) {
 // Returns the log filename depending on `this.prepend` option value
 //
 DailyRotateFile.prototype._getFilename = function () {
+  if (this.datePattern.substring(0, 1) === '.') {
+    this.datePattern = this.datePattern.substring(1);
+  }
+
   var formattedDate = this.getFormattedDate();
 
   if (this.prepend) {
