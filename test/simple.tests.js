@@ -222,7 +222,7 @@ describe('winston/transports/daily-rotate-file', function () {
         'minute pattern .m': {
           pattern: '.m',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
-          mid: 1861947170000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
+          mid: 1861947170000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
           end: 1861947760000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
           oldfile: 'test-rotation.log.32',
           newfile: 'test-rotation.log.42'
@@ -230,7 +230,7 @@ describe('winston/transports/daily-rotate-file', function () {
         'zero padded minute pattern .mm': {
           pattern: '.mm',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
-          mid: 1861947170000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
+          mid: 1861947170000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
           end: 1861947760000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
           oldfile: 'test-rotation.log.32',
           newfile: 'test-rotation.log.42'
@@ -292,6 +292,62 @@ describe('winston/transports/daily-rotate-file', function () {
               }, 500);
             }, 500);
           });
+        });
+      });
+    });
+
+    describe('when passed with maxsize and maxfiles', function () {
+      var dailyRotationPattern = {
+        pattern: '.yyyy-MM-dd',
+        start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
+        mid: 1861986760000, // GMT: Mon, 01 Jan 2029 18:32:40 GMT
+        file1: 'test-rotation.log.2029-01-01',
+        file2: 'test-rotation.log.2029-01-01.1',
+        file3: 'test-rotation.log.2029-01-01.2'
+      };
+
+      describe('when passed the pattern ' + dailyRotationPattern.pattern, function () {
+        var transport;
+        var rotationLogPath = path.join(fixturesDir, 'rotations');
+
+        beforeEach(function () {
+          this.time = new Date(dailyRotationPattern.start);
+          tk.travel(this.time);
+          rimraf.sync(rotationLogPath);
+          mkdirp(rotationLogPath);
+          transport = new DailyRotateFile({
+            filename: path.join(rotationLogPath, 'test-rotation.log'),
+            datePattern: dailyRotationPattern.pattern,
+            maxFiles: 2,
+            maxsize: 100
+          });
+        });
+
+        afterEach(function () {
+          tk.reset();
+        });
+
+        it('should properly rotate log with old files getting deleted', function (done) {
+          transport.log('error', 'test message with more than 100 bytes data');
+          setTimeout(function () {
+            transport.log('error', '2nd test with more than 100 bytes data');
+            setTimeout(function () {
+              this.time = new Date(dailyRotationPattern.mid);
+              tk.travel(this.time);
+              transport.log('error', '3rd test');
+              setTimeout(function () {
+                transport.log('error', '4th test message with more than 100 bytes data');
+                setTimeout(function () {
+                  var filesCreated = fs.readdirSync(rotationLogPath);
+                  expect(filesCreated.length).to.eql(2);
+                  expect(filesCreated).not.to.include(dailyRotationPattern.file1);
+                  expect(filesCreated).to.include(dailyRotationPattern.file2);
+                  expect(filesCreated).to.include(dailyRotationPattern.file3);
+                  done();
+                }, 500);
+              }, 100);
+            }, 100);
+          }, 100);
         });
       });
     });
