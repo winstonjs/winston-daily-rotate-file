@@ -6,6 +6,7 @@ var expect = require('chai').expect;
 var winston = require('winston');
 var rimraf = require('rimraf');
 var mkdirp = require('mkdirp');
+var moment = require('moment');
 var fs = require('fs');
 var tk = require('timekeeper');
 var MemoryStream = require('./memory-stream');
@@ -19,18 +20,61 @@ mkdirp(fixturesDir);
 var transports = {
   'file': new DailyRotateFile({
     filename: path.join(fixturesDir, 'testfilename.log'),
-    datePattern: '.yyyy-MM-dd'
+    prepend: false
   }),
   'stream': new DailyRotateFile({stream: new MemoryStream()}),
   'prepended file': new DailyRotateFile({
     filename: path.join(fixturesDir, 'testfilename.log'),
-    datePattern: 'yyyy-MM-dd_',
     prepend: true
   })
 };
 
 describe('winston/transports/daily-rotate-file', function () {
   describe('an instance of the transport', function () {
+    describe('with default datePatterns', function () {
+      it('should have a proper filename when prepend option is false', function () {
+        var now = moment().format('YYYY-MM-DD');
+        var transport = new DailyRotateFile({
+          filename: path.join(fixturesDir, 'prepend-false.log'),
+          prepend: false
+        });
+
+        expect(transport._getFilename()).to.equal('prepend-false.log.' + now);
+      });
+
+      it('should have a proper filename when prepend options is true', function () {
+        var now = moment().format('YYYY-MM-DD');
+        var transport = new DailyRotateFile({
+          filename: path.join(fixturesDir, 'prepend-true.log'),
+          prepend: true
+        });
+
+        expect(transport._getFilename()).to.equal(now + '.prepend-true.log');
+      });
+
+      it('should remove leading dot if one is provided with datePattern', function () {
+        var now = moment().format('YYYYMMDD');
+        var transport = new DailyRotateFile({
+          filename: path.join(fixturesDir, 'prepend-false.log'),
+          prepend: false,
+          datePattern: '.yyyyMMdd'
+        });
+
+        expect(transport._getFilename()).to.equal('prepend-false.log.' + now);
+      });
+
+      it('should remove leading dot if one is provided with datePattern when prepend option is true', function () {
+        var now = moment().format('YYYY-MM-DD');
+        var transport = new DailyRotateFile({
+          filename: path.join(fixturesDir, 'prepend-true.log'),
+          prepend: true,
+          datePattern: '.yyyy-MM-dd'
+        });
+
+        expect(transport._getFilename()).to.equal(now + '.prepend-true.log');
+      });
+    });
+
     Object.keys(transports).forEach(function (t) {
       describe('when passed a valid ' + t, function () {
         var transport;
@@ -84,8 +128,7 @@ describe('winston/transports/daily-rotate-file', function () {
 
       beforeEach(function () {
         transport = new DailyRotateFile({
-          filename: path.join(fixturesDir, 'invalid', 'testfilename.log'),
-          datePattern: '.yyyy-MM-dd'
+          filename: path.join(fixturesDir, 'invalid', 'testfilename.log')
         });
       });
 
