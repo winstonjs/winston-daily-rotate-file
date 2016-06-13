@@ -268,7 +268,7 @@ describe('winston/transports/daily-rotate-file', function () {
           var transport;
           var rotationLogPath = path.join(fixturesDir, 'rotations');
 
-          beforeEach(function () {
+          beforeEach(function (done) {
             this.time = new Date(patterns[pattern].start);
             tk.travel(this.time);
             rimraf.sync(rotationLogPath);
@@ -277,6 +277,8 @@ describe('winston/transports/daily-rotate-file', function () {
               filename: path.join(rotationLogPath, 'test-rotation.log'),
               datePattern: patterns[pattern].pattern
             });
+
+            done();
           });
 
           afterEach(function () {
