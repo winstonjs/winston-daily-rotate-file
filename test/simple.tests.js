@@ -61,6 +61,16 @@ describe('winston/transports/daily-rotate-file', function () {
         expect(transport._getFilename()).to.equal('prepend-false.log.' + now);
       });
 
+      it('should not add leading dot if one is not provided with datePattern', function () {
+        var now = moment().format('YYYY-MM-DD');
+        var transport = new DailyRotateFile({
+          filename: path.join(fixturesDir, 'log'),
+          datePattern: '-yyyy-MM-dd.log'
+        });
+
+        expect(transport._getFilename()).to.equal('log-' + now + '.log');
+      });
+
       it('should remove leading dot if one is provided with datePattern when prepend option is true', function () {
         var now = moment().format('YYYY-MM-DD');
         var transport = new DailyRotateFile({
