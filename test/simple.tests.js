@@ -24,6 +24,15 @@ var transports = {
   'prepended file': new DailyRotateFile({
     filename: path.join(fixturesDir, 'testfilename.log'),
     prepend: true
+  }),
+  'weekday file': new DailyRotateFile({
+    filename: path.join(fixturesDir, 'testfilename_weekday'),
+    datePattern: '.ddd.log'
+  }),
+  'prepend weekday file': new DailyRotateFile({
+    filename: path.join(fixturesDir, 'testfilename_prepend_weekday.log'),
+    datePattern: 'ddd-',
+    prepend: true
   })
 };
 
