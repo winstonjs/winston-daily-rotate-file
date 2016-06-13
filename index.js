@@ -388,7 +388,6 @@ DailyRotateFile.prototype.stream = function (options) {
 // (if any) and the current size of the file used.
 //
 DailyRotateFile.prototype.open = function (callback) {
-  var now = new Date();
   if (this.opening) {
     //
     // If we are already attempting to open the next
@@ -397,7 +396,7 @@ DailyRotateFile.prototype.open = function (callback) {
     //
     return callback(true);
   } else if (!this._stream || (this.maxsize && this._size >= this.maxsize) ||
-      (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours() || this._minute < now.getUTCMinutes())) {
+      this._filenameHasExpired()) {
     //
     // If we dont have a stream or have exceeded our size, then create
     // the next stream and respond with a value indicating that
@@ -552,7 +551,7 @@ DailyRotateFile.prototype._createStream = function () {
       }
 
       var now = new Date();
-      if (self._year < now.getUTCFullYear() || self._month < now.getUTCMonth() || self._date < now.getUTCDate() || self._hour < now.getUTCHours() || self._minute < now.getUTCMinutes()) {
+      if (self._filenameHasExpired()) {
         self._year = now.getUTCFullYear();
         self._month = now.getUTCMonth();
         self._date = now.getUTCDate();
@@ -634,4 +633,27 @@ DailyRotateFile.prototype._lazyDrain = function () {
       self.emit('logged');
     });
   }
+};
+
+//
+// ### @private function _filenameHasExpired ()
+// Checks whether the current log file is valid
+// based on given datepattern
+//
+DailyRotateFile.prototype._filenameHasExpired = function () {
+  var now = new Date();
+
+  // searching for m is enough to say minute in date pattern
+  if (this.datePattern.match(/m/)) {
+    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours() || this._minute < now.getUTCMinutes());
+  } else if (this.datePattern.match(/H/)) {
+    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours());
+  } else if (this.datePattern.match(/d/)) {
+    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate());
+  } else if (this.datePattern.match(/M/)) {
+    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth());
+  } else if (this.datePattern.match(/yy/)) {
+    return (this._year < now.getUTCFullYear());
+  }
+  return false;
 };
