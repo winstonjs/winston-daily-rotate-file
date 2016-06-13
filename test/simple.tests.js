@@ -341,17 +341,19 @@ describe('winston/transports/daily-rotate-file', function () {
         var transport;
         var rotationLogPath = path.join(fixturesDir, 'rotations');
 
-        beforeEach(function () {
+        beforeEach(function (done) {
           this.time = new Date(dailyRotationPattern.start);
           tk.travel(this.time);
           rimraf.sync(rotationLogPath);
-          mkdirp(rotationLogPath);
+          mkdirp.sync(rotationLogPath);
           transport = new DailyRotateFile({
             filename: path.join(rotationLogPath, 'test-rotation.log'),
             datePattern: dailyRotationPattern.pattern,
             maxFiles: 2,
             maxsize: 100
           });
+
+          done();
         });
 
         afterEach(function () {
