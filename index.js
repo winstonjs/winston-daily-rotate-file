@@ -8,6 +8,7 @@ var Transport = require('winston').Transport;
 var Stream = require('stream').Stream;
 var os = require('os');
 var winston = require('winston');
+var mkdirp = require('mkdirp');
 
 //
 // ### function DailyRotateFile (options)
@@ -74,6 +75,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.eol = options.eol || os.EOL;
   this.maxRetries = options.maxRetries || 2;
   this.prepend = options.prepend || false;
+  this.createTree = options.createTree || false;
 
   if (this.json) {
     this.stringify = options.stringify;
@@ -485,6 +487,10 @@ DailyRotateFile.prototype._createStream = function () {
       if (self._stream) {
         self._stream.end();
         self._stream.destroySoon();
+      }
+
+      if (self.createTree) {
+        mkdirp.sync(path.dirname(fullname));
       }
 
       self._size = size;

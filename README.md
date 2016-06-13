@@ -13,7 +13,8 @@
 The DailyRotateFile transport can rotate files by minute, hour, day, month or year. In addition to the options accepted by the File transport, the Daily Rotate File Transport also accepts the following options:
 
 * __datePattern:__ A string representing the pattern to be used when appending the date to the filename (default '.yyyy-MM-dd'). The meta characters used in this string will dictate the frequency of the file rotation. For example, if your datePattern is simply '.HH' you will end up with 24 log files that are picked up and appended to every day.
-* __prepend:__ Defines if the rolling time of the log file should be prepended at the begging of the filename (default `false`)
+* __prepend:__ Defines if the rolling time of the log file should be prepended at the beginning of the filename (default `false`)
+* __createTree:__ When combined with a `datePattern` that includes path delimiters, the transport will create the entire folder tree to the log file. Example: `datePattern: '/yyyy/MM/dd.log', createTree: true` will create the entire path to the log file prior to writing an entry.
 
 Valid meta characters in the datePattern are:
 
