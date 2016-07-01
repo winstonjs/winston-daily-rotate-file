@@ -91,32 +91,31 @@ var DailyRotateFile = module.exports = function (options) {
   this._buffer = [];
   this._draining = false;
   this._failures = 0;
-  
+
   // Internal variable which will hold a record of all files
-  // belonging to this transport which are currently in the 
+  // belonging to this transport which are currently in the
   // log directory in chronological order.
   //
-  this._currentFiles = function() {
-    
+  this._currentFiles = function () {
+    //
     // Only proceed if maxsize is not configured for this transport.
     if (!this.maxsize) {
       try {
         fs.accessSync(this.dirname, fs.F_OK);
 
-        return fs.readdirSync(this.dirname).filter(function(file) {
+        return fs.readdirSync(this.dirname).filter(function (file) {
           return file.includes(this._basename);
-        }.bind(this)).map(function(file) {
-          return { 
+        }.bind(this)).map(function (file) {
+          return {
             name: file,
             time: fs.statSync(path.join(this.dirname, file)).mtime.getTime()
-          }; 
-        }.bind(this)).sort(function(a, b) { 
-          return a.time - b.time; 
-        }).map(function(v) { 
+          };
+        }.bind(this)).sort(function (a, b) {
+          return a.time - b.time;
+        }).map(function (v) {
           return v.name;
         });
-      }
-      catch (e) {
+      } catch (e) {
         // directory doesnt exist so there are no files. Do nothing.
       }
     }
@@ -623,9 +622,8 @@ DailyRotateFile.prototype._getFile = function (inc) {
     }
 
     this._created += 1;
-  }
-  else if (!this.maxsize) {
-    
+  } else if (!this.maxsize) {
+    //
     // If the filename does not exist in the _currentFiles array then add it.
     if (this._currentFiles.indexOf(filename) === -1) {
       this._currentFiles.push(filename);
@@ -638,12 +636,11 @@ DailyRotateFile.prototype._getFile = function (inc) {
       try {
         fs.accessSync(path.join(this.dirname, this._currentFiles[0]), fs.F_OK);
         fs.unlinkSync(path.join(this.dirname, this._currentFiles[0]));
-      } 
-      catch (e) {
+      } catch (e) {
         // File isn't accessible, do nothing.
       }
-      
-      // Remove the filename that was just deleted from the _currentFiles array. 
+
+      // Remove the filename that was just deleted from the _currentFiles array.
       this._currentFiles = this._currentFiles.slice(1);
     }
   }
