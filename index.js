@@ -94,7 +94,7 @@ var DailyRotateFile = module.exports = function (options) {
   
   // Internal variable which will hold a record of all files
   // belonging to this transport which are currently in the 
-  // log directory.
+  // log directory in chronological order.
   //
   this._currentFiles = function() {
     
@@ -105,7 +105,16 @@ var DailyRotateFile = module.exports = function (options) {
 
         return fs.readdirSync(this.dirname).filter(function(file) {
           return file.includes(this._basename);
-        }.bind(this));
+        }.bind(this)).map(function(file) {
+          return { 
+            name: file,
+            time: fs.statSync(path.join(this.dirname, file)).mtime.getTime()
+          }; 
+        }.bind(this)).sort(function(a, b) { 
+          return a.time - b.time; 
+        }).map(function(v) { 
+          return v.name;
+        });
       }
       catch (e) {
         // directory doesnt exist so there are no files. Do nothing.
