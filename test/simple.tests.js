@@ -398,5 +398,85 @@ describe('winston/transports/daily-rotate-file', function () {
         });
       });
     });
+
+    describe('when passed with maxfiles set and maxsize not set', function () {
+      var dailyRotationPattern = {
+        pattern: '.yyyy-MM-dd',
+        jan1: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
+        jan2: 1862033560000, // GMT: Mon, 02 Jan 2029 07:32:40 GMT
+        jan3: 1862119960000, // GMT: Mon, 03 Jan 2029 07:32:40 GMT
+        file1: 'test-rotation-no-maxsize.log.2029-01-01',
+        file2: 'test-rotation-no-maxsize.log.2029-01-02',
+        file3: 'test-rotation-no-maxsize.log.2029-01-03'
+      };
+
+      describe('when passed the pattern ' + dailyRotationPattern.pattern + ' and no maxsize', function () {
+        var transport;
+        var rotationLogPath = path.join(fixturesDir, 'rotations_no_maxsize');
+
+        beforeEach(function (done) {
+          rimraf.sync(rotationLogPath);
+          mkdirp.sync(rotationLogPath);
+          transport = new DailyRotateFile({
+            filename: path.join(rotationLogPath, 'test-rotation-no-maxsize.log'),
+            datePattern: dailyRotationPattern.pattern,
+            maxFiles: 2
+          });
+
+          done();
+        });
+
+        afterEach(function () {
+          tk.reset();
+        });
+
+        it('should properly rotate log without maxzsize set and with old files getting deleted', function (done) {
+          var self = this;
+          self.time = new Date(dailyRotationPattern.jan1);
+          tk.travel(self.time);
+
+          transport.log('error', 'test message on Jan 1st', {}, function (err) {
+            if (err) {
+              done(err);
+            }
+
+            self.time = new Date(dailyRotationPattern.jan2);
+            tk.travel(self.time);
+
+            transport.log('error', 'test message on Jan 2nd', {}, function (err) {
+              if (err) {
+                done(err);
+              }
+
+              self.time = new Date(dailyRotationPattern.jan3);
+              tk.travel(self.time);
+
+              transport.log('error', 'test message on Jan 3rd', {}, function (err) {
+                if (err) {
+                  done(err);
+                }
+
+                self.time = new Date(dailyRotationPattern.jan3);
+                tk.travel(self.time);
+
+                transport.log('error', 'second test message on Jan 3rd', {}, function (err) {
+                  if (err) {
+                    done(err);
+                  }
+
+                  var filesCreated = fs.readdirSync(rotationLogPath);
+                  console.log('files : ' + filesCreated);
+                  expect(filesCreated.length).to.eql(2);
+                  expect(filesCreated).not.to.include(dailyRotationPattern.file1);
+                  expect(filesCreated).to.include(dailyRotationPattern.file2);
+                  expect(filesCreated).to.include(dailyRotationPattern.file3);
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+    });
   });
 });
