@@ -585,9 +585,13 @@ DailyRotateFile.prototype._getFile = function (inc) {
     if (this.maxFiles && (this._created >= (this.maxFiles - 1))) {
       remaining = this._created - (this.maxFiles - 1);
       if (remaining === 0) {
-        fs.unlinkSync(path.join(this.dirname, filename));
+        try {
+          fs.unlinkSync(path.join(this.dirname, filename));
+        } catch (e) {}
       } else {
-        fs.unlinkSync(path.join(this.dirname, filename + '.' + remaining));
+        try {
+          fs.unlinkSync(path.join(this.dirname, filename + '.' + remaining));
+        } catch (e) {}
       }
     }
 

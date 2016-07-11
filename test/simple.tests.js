@@ -14,8 +14,6 @@ var MemoryStream = require('./memory-stream');
 var DailyRotateFile = require('../');
 
 var fixturesDir = path.join(__dirname, 'fixtures');
-rimraf.sync(fixturesDir);
-mkdirp(fixturesDir);
 
 var transports = {
   'file': new DailyRotateFile({
@@ -39,10 +37,15 @@ var transports = {
 };
 
 describe('winston/transports/daily-rotate-file', function () {
+  before(function () {
+    rimraf.sync(fixturesDir);
+    mkdirp.sync(fixturesDir);
+  });
+
   describe('an instance of the transport', function () {
     describe('with default datePatterns', function () {
       it('should have a proper filename when prepend option is false', function () {
-        var now = moment().format('YYYY-MM-DD');
+        var now = moment().utc().format('YYYY-MM-DD');
         var transport = new DailyRotateFile({
           filename: path.join(fixturesDir, 'prepend-false.log'),
           prepend: false
@@ -52,7 +55,7 @@ describe('winston/transports/daily-rotate-file', function () {
       });
 
       it('should have a proper filename when prepend options is true', function () {
-        var now = moment().format('YYYY-MM-DD');
+        var now = moment().utc().format('YYYY-MM-DD');
         var transport = new DailyRotateFile({
           filename: path.join(fixturesDir, 'prepend-true.log'),
           prepend: true
@@ -62,7 +65,7 @@ describe('winston/transports/daily-rotate-file', function () {
       });
 
       it('should remove leading dot if one is provided with datePattern', function () {
-        var now = moment().format('YYYYMMDD');
+        var now = moment().utc().format('YYYYMMDD');
         var transport = new DailyRotateFile({
           filename: path.join(fixturesDir, 'prepend-false.log'),
           prepend: false,
@@ -73,7 +76,7 @@ describe('winston/transports/daily-rotate-file', function () {
       });
 
       it('should not add leading dot if one is not provided with datePattern', function () {
-        var now = moment().format('YYYY-MM-DD');
+        var now = moment().utc().format('YYYY-MM-DD');
         var transport = new DailyRotateFile({
           filename: path.join(fixturesDir, 'log'),
           datePattern: '-yyyy-MM-dd.log'
@@ -83,7 +86,7 @@ describe('winston/transports/daily-rotate-file', function () {
       });
 
       it('should remove leading dot if one is provided with datePattern when prepend option is true', function () {
-        var now = moment().format('YYYY-MM-DD');
+        var now = moment().utc().format('YYYY-MM-DD');
         var transport = new DailyRotateFile({
           filename: path.join(fixturesDir, 'prepend-true.log'),
           prepend: true,
