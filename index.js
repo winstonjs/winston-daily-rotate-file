@@ -101,8 +101,6 @@ var DailyRotateFile = module.exports = function (options) {
     // Only proceed if maxsize is not configured for this transport.
     if (!this.maxsize) {
       try {
-        fs.accessSync(this.dirname, fs.F_OK);
-
         return fs.readdirSync(this.dirname).filter(function (file) {
           return file.includes(this._basename);
         }.bind(this)).map(function (file) {
@@ -634,7 +632,6 @@ DailyRotateFile.prototype._getFile = function (inc) {
     // 0.
     while (this.maxFiles && (this._currentFiles.length > this.maxFiles)) {
       try {
-        fs.accessSync(path.join(this.dirname, this._currentFiles[0]), fs.F_OK);
         fs.unlinkSync(path.join(this.dirname, this._currentFiles[0]));
       } catch (e) {
         // File isn't accessible, do nothing.
