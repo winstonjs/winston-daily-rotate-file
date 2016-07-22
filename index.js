@@ -66,6 +66,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.json = options.json !== false;
   this.colorize = options.colorize || false;
   this.maxsize = options.maxsize || null;
+  this.logstash = options.logstash || null;
   this.maxFiles = options.maxFiles || null;
   this.label = options.label || null;
   this.prettyPrint = options.prettyPrint || false;
@@ -176,6 +177,7 @@ DailyRotateFile.prototype.log = function (level, msg, meta, callback) {
     meta: meta,
     json: this.json,
     colorize: this.colorize,
+    logstash: this.logstash,
     prettyPrint: this.prettyPrint,
     timestamp: this.timestamp,
     label: this.label,
