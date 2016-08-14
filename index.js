@@ -77,6 +77,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.eol = options.eol || os.EOL;
   this.maxRetries = options.maxRetries || 2;
   this.prepend = options.prepend || false;
+  this.localTime = options.localTime || false;
 
   if (this.json) {
     this.stringify = options.stringify;
@@ -122,13 +123,21 @@ var DailyRotateFile = module.exports = function (options) {
   }.bind(this)();
 
   var now = new Date();
-  this._year = now.getUTCFullYear();
-  this._month = now.getUTCMonth();
-  this._date = now.getUTCDate();
-  this._hour = now.getUTCHours();
-  this._minute = now.getUTCMinutes();
-  this._weekday = weekday[now.getUTCDay()];
-
+  if (this.localTime) {
+    this._year = now.getFullYear();
+    this._month = now.getMonth();
+    this._date = now.getDate();
+    this._hour = now.getHours();
+    this._minute = now.getMinutes();
+    this._weekday = weekday[now.getDay()];
+  } else {
+    this._year = now.getUTCFullYear();
+    this._month = now.getUTCMonth();
+    this._date = now.getUTCDate();
+    this._hour = now.getUTCHours();
+    this._minute = now.getUTCMinutes();
+    this._weekday = weekday[now.getUTCDay()];
+  }
   var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhM])\1?/g;
   var pad = function (val, len) {
     val = String(val);

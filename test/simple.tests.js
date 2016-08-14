@@ -54,6 +54,17 @@ describe('winston/transports/daily-rotate-file', function () {
         expect(transport._getFilename()).to.equal('prepend-false.log.' + now);
       });
 
+      it('should have a proper filename when prepend option is false (localtime)', function () {
+        var now = moment().format('YYYY-MM-DD');
+        var transport = new DailyRotateFile({
+          filename: path.join(fixturesDir, 'prepend-false.log'),
+          localTime: true,
+          prepend: false
+        });
+
+        expect(transport._getFilename()).to.equal('prepend-false.log.' + now);
+      });
+
       it('should have a proper filename when prepend options is true', function () {
         var now = moment().utc().format('YYYY-MM-DD');
         var transport = new DailyRotateFile({
