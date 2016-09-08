@@ -122,22 +122,12 @@ var DailyRotateFile = module.exports = function (options) {
     return [];
   }.bind(this)();
 
-  var now = new Date();
-  if (this.localTime) {
-    this._year = now.getFullYear();
-    this._month = now.getMonth();
-    this._date = now.getDate();
-    this._hour = now.getHours();
-    this._minute = now.getMinutes();
-    this._weekday = weekday[now.getDay()];
-  } else {
-    this._year = now.getUTCFullYear();
-    this._month = now.getUTCMonth();
-    this._date = now.getUTCDate();
-    this._hour = now.getUTCHours();
-    this._minute = now.getUTCMinutes();
-    this._weekday = weekday[now.getUTCDay()];
-  }
+  this._year = this._getTime('year');
+  this._month = this._getTime('month');
+  this._date = this._getTime('date');
+  this._hour = this._getTime('hour');
+  this._minute = this._getTime('minute');
+  this._weekday = weekday[this._getTime('day')];
   var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhM])\1?/g;
   var pad = function (val, len) {
     val = String(val);
@@ -589,14 +579,13 @@ DailyRotateFile.prototype._createStream = function () {
         return checkFile(self._getFile(true));
       }
 
-      var now = new Date();
       if (self._filenameHasExpired()) {
-        self._year = now.getUTCFullYear();
-        self._month = now.getUTCMonth();
-        self._date = now.getUTCDate();
-        self._hour = now.getUTCHours();
-        self._minute = now.getUTCMinutes();
-        self._weekday = weekday[now.getUTCDay()];
+        self._year = self._getTime('year');
+        self._month = self._getTime('month');
+        self._date = self._getTime('date');
+        self._hour = self._getTime('hour');
+        self._minute = self._getTime('minute');
+        self._weekday = weekday[self._getTime('day')];
         self._created = 0;
         return checkFile(self._getFile());
       }
@@ -704,19 +693,55 @@ DailyRotateFile.prototype._lazyDrain = function () {
 // based on given datepattern
 //
 DailyRotateFile.prototype._filenameHasExpired = function () {
-  var now = new Date();
-
   // searching for m is enough to say minute in date pattern
   if (this.datePattern.match(/m/)) {
-    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours() || this._minute < now.getUTCMinutes());
+    return (this._year < this._getTime('year') || this._month < this._getTime('month') || this._date < this._getTime('date') || this._hour < this._getTime('hour') || this._minute < this._getTime('minute'));
   } else if (this.datePattern.match(/H/)) {
-    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate() || this._hour < now.getUTCHours());
+    return (this._year < this._getTime('year') || this._month < this._getTime('month') || this._date < this._getTime('date') || this._hour < this._getTime('hour'));
   } else if (this.datePattern.match(/d/)) {
-    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth() || this._date < now.getUTCDate());
+    return (this._year < this._getTime('year') || this._month < this._getTime('month') || this._date < this._getTime('date'));
   } else if (this.datePattern.match(/M/)) {
-    return (this._year < now.getUTCFullYear() || this._month < now.getUTCMonth());
+    return (this._year < this._getTime('year') || this._month < this._getTime('month'));
   } else if (this.datePattern.match(/yy/)) {
-    return (this._year < now.getUTCFullYear());
+    return (this._year < this._getTime('year'));
   }
   return false;
+};
+
+//
+// ### @private function _getTime ()
+// Get current date/time
+// based on localTime config
+//
+DailyRotateFile.prototype._getTime = function (timeType) {
+  var now = new Date();
+
+  if (this.localTime) {
+    if (timeType === 'year') {
+      return now.getFullYear();
+    } else if (timeType === 'month') {
+      return now.getMonth();
+    } else if (timeType === 'date') {
+      return now.getDate();
+    } else if (timeType === 'hour') {
+      return now.getHours();
+    } else if (timeType === 'minute') {
+      return now.getMinutes();
+    } else if (timeType === 'day') {
+      return now.getDay();
+    }
+  }
+  if (timeType === 'year') {
+    return now.getUTCFullYear();
+  } else if (timeType === 'month') {
+    return now.getUTCMonth();
+  } else if (timeType === 'date') {
+    return now.getUTCDate();
+  } else if (timeType === 'hour') {
+    return now.getUTCHours();
+  } else if (timeType === 'minute') {
+    return now.getUTCMinutes();
+  } else if (timeType === 'day') {
+    return now.getUTCDay();
+  }
 };
