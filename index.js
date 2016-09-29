@@ -72,7 +72,9 @@ var DailyRotateFile = module.exports = function (options) {
   this.prettyPrint = options.prettyPrint || false;
   this.showLevel = options.showLevel === undefined ? true : options.showLevel;
   this.timestamp = options.timestamp ? options.timestamp : true;
-  this.datePattern = options.datePattern ? options.datePattern : '.yyyy-MM-dd';
+  this.datePattern = options.datePattern ? options.datePattern : 'yyyy-MM-dd';
+  this.separator = options.separator ? options.separator : '.';
+  this.defaultExtension = options.defaultExtension ? options.defaultExtension : '.log';
   this.depth = options.depth || null;
   this.eol = options.eol || os.EOL;
   this.maxRetries = options.maxRetries || 2;
@@ -657,15 +659,23 @@ DailyRotateFile.prototype._getFilename = function () {
   var formattedDate = this.getFormattedDate();
 
   if (this.prepend) {
-    if (this.datePattern === '.yyyy-MM-dd') {
-      this.datePattern = 'yyyy-MM-dd.';
-      formattedDate = this.getFormattedDate();
-    }
-
-    return formattedDate + this._basename;
+    var hasExtension = this._basename.indexOf('.') > -1;
+    return formattedDate + this.separator + this._basename + (hasExtension ? '' : this.defaultExtension);
   }
 
-  return this._basename + formattedDate;
+  var namePieces = this._basename.split('.');
+
+  if (namePieces.length == 1)
+  {
+    return this._basename + formattedDate + this.defaultExtension;
+  }
+  else 
+  {
+    var extension = namePieces.pop();
+
+    return namePieces.join('.') + this.separator + formattedDate + '.' + extension;
+  }
+
 };
 
 //
