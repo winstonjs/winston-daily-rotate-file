@@ -492,5 +492,166 @@ describe('winston/transports/daily-rotate-file', function () {
         });
       });
     });
+
+    describe('when zippedArchive is true and passed an valid filename with different date patterns for log rotation', function () {
+      // patterns having one start timestamp for which log file will be creted,
+      // then one mid timestamp for which log file should not be rotated,
+      // and finally one end timestamp for which log file should be rotated and
+      // new logfile should be created.
+      var patterns = {
+        'full year pattern .yyyy': {
+          pattern: '.yyyy',
+          start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
+          mid: 1874993560000, // GMT: Fri, 01 Jun 2029 07:32:40 GMT
+          end: 1893483160000, // GMT: Tue, 01 Jan 2030 07:32:40 GMT
+          oldfile: 'test-rotation.log.2029',
+          newfile: 'test-rotation.log.2030'
+        },
+        'small year pattern .yy': {
+          pattern: '.yy',
+          start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
+          mid: 1874993560000, // GMT: Fri, 01 Jun 2029 07:32:40 GMT
+          end: 1893483160000, // GMT: Tue, 01 Jan 2030 07:32:40 GMT
+          oldfile: 'test-rotation.log.29',
+          newfile: 'test-rotation.log.30'
+        },
+        'month pattern .M': {
+          pattern: '.M',
+          start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
+          mid: 1863156760000, // GMT: Mon, 15 Jan 2029 07:32:40 GMT
+          end: 1864625560000, // GMT: Thu, 01 Feb 2029 07:32:40 GMT
+          oldfile: 'test-rotation.log.1',
+          newfile: 'test-rotation.log.2'
+        },
+        'zero padded month pattern .MM': {
+          pattern: '.MM',
+          start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
+          mid: 1863156760000, // GMT: Mon, 15 Jan 2029 07:32:40 GMT
+          end: 1864625560000, // GMT: Thu, 01 Feb 2029 07:32:40 GMT
+          oldfile: 'test-rotation.log.01',
+          newfile: 'test-rotation.log.02'
+        },
+        'daypattern .d': {
+          pattern: '.d',
+          start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
+          mid: 1861986760000, // GMT: Mon, 01 Jan 2029 18:32:40 GMT
+          end: 1863156760000, // GMT: Mon, 15 Jan 2029 07:32:40 GMT
+          oldfile: 'test-rotation.log.1',
+          newfile: 'test-rotation.log.15'
+        },
+        'zero padded day pattern .dd': {
+          pattern: '.dd',
+          start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
+          mid: 1861986760000, // GMT: Mon, 01 Jan 2029 18:32:40 GMT
+          end: 1863156760000, // GMT: Mon, 15 Jan 2029 07:32:40 GMT
+          oldfile: 'test-rotation.log.01',
+          newfile: 'test-rotation.log.15'
+        },
+        'hour pattern .H': {
+          pattern: '.H',
+          start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
+          mid: 1861947760000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
+          end: 1861950760000, // GMT: Mon, 01 Jan 2029 08:32:40 GMT
+          oldfile: 'test-rotation.log.7',
+          newfile: 'test-rotation.log.8'
+        },
+        'zero padded hour pattern .HH': {
+          pattern: '.HH',
+          start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
+          mid: 1861947760000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
+          end: 1861950760000, // GMT: Mon, 01 Jan 2029 08:32:40 GMT
+          oldfile: 'test-rotation.log.07',
+          newfile: 'test-rotation.log.08'
+        },
+        'minute pattern .m': {
+          pattern: '.m',
+          start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
+          mid: 1861947170000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
+          end: 1861947760000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
+          oldfile: 'test-rotation.log.32',
+          newfile: 'test-rotation.log.42'
+        },
+        'zero padded minute pattern .mm': {
+          pattern: '.mm',
+          start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
+          mid: 1861947170000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
+          end: 1861947760000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
+          oldfile: 'test-rotation.log.32',
+          newfile: 'test-rotation.log.42'
+        },
+        'daily rotation pattern .yyyy-MM-dd': {
+          pattern: '.yyyy-MM-dd',
+          start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
+          mid: 1861965828000, // GMT: Mon, 01 Jan 2029 12:43:48 GMT
+          end: 1863156760000, // GMT: Mon, 15 Jan 2029 07:32:40 GMT
+          oldfile: 'test-rotation.log.2029-01-01',
+          newfile: 'test-rotation.log.2029-01-15'
+        }
+      };
+      Object.keys(patterns).forEach(function (pattern) {
+        describe('when passed the pattern ' + pattern, function () {
+          var transport;
+          var rotationLogPath = path.join(fixturesDir, 'rotations');
+
+          beforeEach(function (done) {
+            this.time = new Date(patterns[pattern].start);
+            tk.travel(this.time);
+            rimraf.sync(rotationLogPath);
+            mkdirp.sync(rotationLogPath);
+            transport = new DailyRotateFile({
+              filename: path.join(rotationLogPath, 'test-rotation.log'),
+              datePattern: patterns[pattern].pattern,
+              zippedArchive: true
+            });
+
+            done();
+          });
+
+          afterEach(function () {
+            tk.reset();
+          });
+
+          it('should create log with proper timestamp', function (done) {
+            var self = this;
+
+            transport.log('error', 'test message', {}, function (err) {
+              if (err) {
+                done(err);
+              }
+
+              var filesCreated = fs.readdirSync(rotationLogPath);
+              expect(filesCreated.length).to.eql(1);
+              expect(filesCreated).to.include(patterns[pattern].oldfile);
+              self.time = new Date(patterns[pattern].mid);
+              tk.travel(self.time);
+              transport.log('error', '2nd test message', {}, function (err) {
+                if (err) {
+                  done(err);
+                }
+
+                filesCreated = fs.readdirSync(rotationLogPath);
+                expect(filesCreated.length).to.eql(1);
+                expect(filesCreated).to.include(patterns[pattern].oldfile);
+                self.time = new Date(patterns[pattern].end);
+                tk.travel(self.time);
+                transport.log('error', '3rd test message', {}, function (err) {
+                  if (err) {
+                    done(err);
+                  }
+
+                  filesCreated = fs.readdirSync(rotationLogPath);
+                  expect(filesCreated.length).to.eql(2);
+                  expect(filesCreated).to.include(patterns[pattern].newfile);
+                  expect(filesCreated).to.include(patterns[pattern].oldfile + '.gz');
+                  transport.close();
+
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+    });
   });
 });
