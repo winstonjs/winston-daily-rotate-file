@@ -364,7 +364,7 @@ describe('winston/transports/daily-rotate-file', function () {
             filename: path.join(rotationLogPath, 'test-rotation.log'),
             datePattern: dailyRotationPattern.pattern,
             maxFiles: 2,
-            maxsize: 100
+            maxsize: 50
           });
 
           done();
