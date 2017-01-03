@@ -149,6 +149,7 @@ var DailyRotateFile = module.exports = function (options) {
     this._date = this._getTime('date');
     this._hour = this._getTime('hour');
     this._minute = this._getTime('minute');
+    this._weekday = weekday[this._getTime('day')];
 
     var flags = {
       yy: String(this._year).slice(2),
