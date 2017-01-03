@@ -142,8 +142,7 @@ var DailyRotateFile = module.exports = function (options) {
   };
 
   this.getFormattedDate = function () {
-
-    // update the year, month, date... valriables
+    // update the year, month, date... variables
     this._year = this._getTime('year');
     this._month = this._getTime('month');
     this._date = this._getTime('date');
