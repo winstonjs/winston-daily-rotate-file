@@ -648,7 +648,12 @@ DailyRotateFile.prototype._getFile = function (inc) {
     }
   }
 
-  return this._created ? filename + '.' + this._created : filename;
+  if (this._created)
+  {
+    var fileNamePieces = filename.split('.');
+    var extension = fileNamePieces.pop(); 
+  }
+  return this._created ? fileNamePieces.join('.') + this.separator + this._created + '.' + extension : filename;
 };
 
 //
@@ -667,7 +672,7 @@ DailyRotateFile.prototype._getFilename = function () {
 
   if (namePieces.length == 1)
   {
-    return this._basename + formattedDate + this.defaultExtension;
+    return this._basename + this.separator + formattedDate + this.defaultExtension;
   }
   else 
   {

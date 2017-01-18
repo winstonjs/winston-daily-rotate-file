@@ -27,7 +27,7 @@ var transports = {
   }),
   'weekday file': new DailyRotateFile({
     filename: path.join(fixturesDir, 'testfilename_weekday'),
-    datePattern: '.ddd.log'
+    datePattern: 'ddd'
   }),
   'prepend weekday file': new DailyRotateFile({
     filename: path.join(fixturesDir, 'testfilename_prepend_weekday.log'),
@@ -51,7 +51,7 @@ describe('winston/transports/daily-rotate-file', function () {
           prepend: false
         });
 
-        expect(transport._getFilename()).to.equal('prepend-false.log.' + now);
+        expect(transport._getFilename()).to.equal('prepend-false.' + now + '.log');
       });
 
       it('should have a proper filename when prepend option is false (localtime)', function () {
@@ -62,7 +62,7 @@ describe('winston/transports/daily-rotate-file', function () {
           prepend: false
         });
 
-        expect(transport._getFilename()).to.equal('prepend-false.log.' + now);
+        expect(transport._getFilename()).to.equal('prepend-false.' + now + '.log');
       });
 
       it('should have a proper filename when prepend options is true', function () {
@@ -80,17 +80,18 @@ describe('winston/transports/daily-rotate-file', function () {
         var transport = new DailyRotateFile({
           filename: path.join(fixturesDir, 'prepend-false.log'),
           prepend: false,
-          datePattern: '.yyyyMMdd'
+          datePattern: 'yyyyMMdd'
         });
 
-        expect(transport._getFilename()).to.equal('prepend-false.log.' + now);
+        expect(transport._getFilename()).to.equal('prepend-false.' + now + '.log');
       });
 
       it('should not add leading dot if one is not provided with datePattern', function () {
         var now = moment().utc().format('YYYY-MM-DD');
         var transport = new DailyRotateFile({
           filename: path.join(fixturesDir, 'log'),
-          datePattern: '-yyyy-MM-dd.log'
+          datePattern: 'yyyy-MM-dd',
+          separator: '-'
         });
 
         expect(transport._getFilename()).to.equal('log-' + now + '.log');
@@ -101,7 +102,7 @@ describe('winston/transports/daily-rotate-file', function () {
         var transport = new DailyRotateFile({
           filename: path.join(fixturesDir, 'prepend-true.log'),
           prepend: true,
-          datePattern: '.yyyy-MM-dd'
+          datePattern: 'yyyy-MM-dd'
         });
 
         expect(transport._getFilename()).to.equal(now + '.prepend-true.log');
@@ -189,92 +190,92 @@ describe('winston/transports/daily-rotate-file', function () {
       // new logfile should be created.
       var patterns = {
         'full year pattern .yyyy': {
-          pattern: '.yyyy',
+          pattern: 'yyyy',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
           mid: 1874993560000, // GMT: Fri, 01 Jun 2029 07:32:40 GMT
           end: 1893483160000, // GMT: Tue, 01 Jan 2030 07:32:40 GMT
-          oldfile: 'test-rotation.log.2029',
-          newfile: 'test-rotation.log.2030'
+          oldfile: 'test-rotation.2029.log',
+          newfile: 'test-rotation.2030.log'
         },
         'small year pattern .yy': {
-          pattern: '.yy',
+          pattern: 'yy',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
           mid: 1874993560000, // GMT: Fri, 01 Jun 2029 07:32:40 GMT
           end: 1893483160000, // GMT: Tue, 01 Jan 2030 07:32:40 GMT
-          oldfile: 'test-rotation.log.29',
-          newfile: 'test-rotation.log.30'
+          oldfile: 'test-rotation.29.log',
+          newfile: 'test-rotation.30.log'
         },
         'month pattern .M': {
-          pattern: '.M',
+          pattern: 'M',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
           mid: 1863156760000, // GMT: Mon, 15 Jan 2029 07:32:40 GMT
           end: 1864625560000, // GMT: Thu, 01 Feb 2029 07:32:40 GMT
-          oldfile: 'test-rotation.log.1',
-          newfile: 'test-rotation.log.2'
+          oldfile: 'test-rotation.1.log',
+          newfile: 'test-rotation.2.log'
         },
         'zero padded month pattern .MM': {
-          pattern: '.MM',
+          pattern: 'MM',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
           mid: 1863156760000, // GMT: Mon, 15 Jan 2029 07:32:40 GMT
           end: 1864625560000, // GMT: Thu, 01 Feb 2029 07:32:40 GMT
-          oldfile: 'test-rotation.log.01',
-          newfile: 'test-rotation.log.02'
+          oldfile: 'test-rotation.01.log',
+          newfile: 'test-rotation.02.log'
         },
         'daypattern .d': {
-          pattern: '.d',
+          pattern: 'd',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
           mid: 1861986760000, // GMT: Mon, 01 Jan 2029 18:32:40 GMT
           end: 1863156760000, // GMT: Mon, 15 Jan 2029 07:32:40 GMT
-          oldfile: 'test-rotation.log.1',
-          newfile: 'test-rotation.log.15'
+          oldfile: 'test-rotation.1.log',
+          newfile: 'test-rotation.15.log'
         },
         'zero padded day pattern .dd': {
-          pattern: '.dd',
+          pattern: 'dd',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
           mid: 1861986760000, // GMT: Mon, 01 Jan 2029 18:32:40 GMT
           end: 1863156760000, // GMT: Mon, 15 Jan 2029 07:32:40 GMT
-          oldfile: 'test-rotation.log.01',
-          newfile: 'test-rotation.log.15'
+          oldfile: 'test-rotation.01.log',
+          newfile: 'test-rotation.15.log'
         },
         'hour pattern .H': {
-          pattern: '.H',
+          pattern: 'H',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
           mid: 1861947760000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
           end: 1861950760000, // GMT: Mon, 01 Jan 2029 08:32:40 GMT
-          oldfile: 'test-rotation.log.7',
-          newfile: 'test-rotation.log.8'
+          oldfile: 'test-rotation.7.log',
+          newfile: 'test-rotation.8.log'
         },
         'zero padded hour pattern .HH': {
-          pattern: '.HH',
+          pattern: 'HH',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
           mid: 1861947760000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
           end: 1861950760000, // GMT: Mon, 01 Jan 2029 08:32:40 GMT
-          oldfile: 'test-rotation.log.07',
-          newfile: 'test-rotation.log.08'
+          oldfile: 'test-rotation.07.log',
+          newfile: 'test-rotation.08.log'
         },
         'minute pattern .m': {
-          pattern: '.m',
+          pattern: 'm',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
           mid: 1861947170000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
           end: 1861947760000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
-          oldfile: 'test-rotation.log.32',
-          newfile: 'test-rotation.log.42'
+          oldfile: 'test-rotation.32.log',
+          newfile: 'test-rotation.42.log'
         },
         'zero padded minute pattern .mm': {
-          pattern: '.mm',
+          pattern: 'mm',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
           mid: 1861947170000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
           end: 1861947760000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
-          oldfile: 'test-rotation.log.32',
-          newfile: 'test-rotation.log.42'
+          oldfile: 'test-rotation.32.log',
+          newfile: 'test-rotation.42.log'
         },
         'daily rotation pattern .yyyy-MM-dd': {
-          pattern: '.yyyy-MM-dd',
+          pattern: 'yyyy-MM-dd',
           start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
           mid: 1861965828000, // GMT: Mon, 01 Jan 2029 12:43:48 GMT
           end: 1863156760000, // GMT: Mon, 15 Jan 2029 07:32:40 GMT
-          oldfile: 'test-rotation.log.2029-01-01',
-          newfile: 'test-rotation.log.2029-01-15'
+          oldfile: 'test-rotation.2029-01-01.log',
+          newfile: 'test-rotation.2029-01-15.log'
         }
       };
       Object.keys(patterns).forEach(function (pattern) {
@@ -343,12 +344,12 @@ describe('winston/transports/daily-rotate-file', function () {
 
     describe('when passed with maxsize and maxfiles', function () {
       var dailyRotationPattern = {
-        pattern: '.yyyy-MM-dd',
+        pattern: 'yyyy-MM-dd',
         start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
         mid: 1861986760000, // GMT: Mon, 01 Jan 2029 18:32:40 GMT
-        file1: 'test-rotation.log.2029-01-01',
-        file2: 'test-rotation.log.2029-01-01.1',
-        file3: 'test-rotation.log.2029-01-01.2'
+        file1: 'test-rotation.2029-01-01.log',
+        file2: 'test-rotation.2029-01-01.1.log',
+        file3: 'test-rotation.2029-01-01.2.log'
       };
 
       describe('when passed the pattern ' + dailyRotationPattern.pattern, function () {
@@ -361,7 +362,7 @@ describe('winston/transports/daily-rotate-file', function () {
           rimraf.sync(rotationLogPath);
           mkdirp.sync(rotationLogPath);
           transport = new DailyRotateFile({
-            filename: path.join(rotationLogPath, 'test-rotation.log'),
+            filename: path.join(rotationLogPath, 'test-rotation'),
             datePattern: dailyRotationPattern.pattern,
             maxFiles: 2,
             maxsize: 100
@@ -415,13 +416,13 @@ describe('winston/transports/daily-rotate-file', function () {
 
     describe('when passed with maxfiles set and maxsize not set', function () {
       var dailyRotationPattern = {
-        pattern: '.yyyy-MM-dd',
+        pattern: 'yyyy-MM-dd',
         jan1: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:40 GMT
         jan2: 1862033560000, // GMT: Mon, 02 Jan 2029 07:32:40 GMT
         jan3: 1862119960000, // GMT: Mon, 03 Jan 2029 07:32:40 GMT
-        file1: 'test-rotation-no-maxsize.log.2029-01-01',
-        file2: 'test-rotation-no-maxsize.log.2029-01-02',
-        file3: 'test-rotation-no-maxsize.log.2029-01-03'
+        file1: 'test-rotation-no-maxsize.2029-01-01.log',
+        file2: 'test-rotation-no-maxsize.2029-01-02.log',
+        file3: 'test-rotation-no-maxsize.2029-01-03.log'
       };
 
       describe('when passed the pattern ' + dailyRotationPattern.pattern + ' and no maxsize', function () {
