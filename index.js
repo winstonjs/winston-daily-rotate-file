@@ -72,7 +72,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.label = options.label || null;
   this.prettyPrint = options.prettyPrint || false;
   this.showLevel = options.showLevel === undefined ? true : options.showLevel;
-  this.timestamp = options.timestamp || true;
+  this.timestamp = options.timestamp === undefined ? true : options.timestamp;
   this.datePattern = options.datePattern ? options.datePattern : '.yyyy-MM-dd';
   this.depth = options.depth || null;
   this.eol = options.eol || os.EOL;
