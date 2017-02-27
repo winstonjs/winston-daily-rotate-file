@@ -584,8 +584,6 @@ DailyRotateFile.prototype._createStream = function () {
         var out = fs.createWriteStream(logfile + '.gz');
 
         inp.pipe(gzip).pipe(out);
-
-        self._created += 1;
         fs.unlink(String(logfile));
       }
     }
