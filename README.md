@@ -30,6 +30,8 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
 
 * __datePattern:__ A string representing the pattern to be used when appending the date to the filename (default 'yyyy-MM-dd'). The meta characters used in this string will dictate the frequency of the file rotation. For example, if your datePattern is simply 'HH' you will end up with 24 log files that are picked up and appended to every day.
 * __prepend:__ Defines if the rolling time of the log file should be prepended at the beginning of the filename (default 'false').
+* __localTime:__ A boolean to define whether time stamps should be local (default 'false' means that UTC time will be used).
+* __zippedArchive:__ A boolean to define whether or not to gzip archived log files (default 'false').
 
 Valid meta characters in the datePattern are:
 
