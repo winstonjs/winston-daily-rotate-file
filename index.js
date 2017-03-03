@@ -8,6 +8,7 @@ var Transport = require('winston').Transport;
 var Stream = require('stream').Stream;
 var os = require('os');
 var winston = require('winston');
+var zlib = require('zlib');
 
 var weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -71,7 +72,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.label = options.label || null;
   this.prettyPrint = options.prettyPrint || false;
   this.showLevel = options.showLevel === undefined ? true : options.showLevel;
-  this.timestamp = options.timestamp ? options.timestamp : true;
+  this.timestamp = options.timestamp === undefined ? true : options.timestamp;
   this.datePattern = options.datePattern ? options.datePattern : 'yyyy-MM-dd';
   this.separator = options.separator ? options.separator : '.';
   this.defaultExtension = options.defaultExtension ? options.defaultExtension : '.log';
@@ -80,6 +81,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.maxRetries = options.maxRetries || 2;
   this.prepend = options.prepend || false;
   this.localTime = options.localTime || false;
+  this.zippedArchive = options.zippedArchive || false;
 
   if (this.json) {
     this.stringify = options.stringify;
@@ -95,6 +97,7 @@ var DailyRotateFile = module.exports = function (options) {
   this._buffer = [];
   this._draining = false;
   this._failures = 0;
+  this._archive = false;
 
   // Internal variable which will hold a record of all files
   // belonging to this transport which are currently in the
@@ -141,6 +144,14 @@ var DailyRotateFile = module.exports = function (options) {
   };
 
   this.getFormattedDate = function () {
+    // update the year, month, date... variables
+    this._year = this._getTime('year');
+    this._month = this._getTime('month');
+    this._date = this._getTime('date');
+    this._hour = this._getTime('hour');
+    this._minute = this._getTime('minute');
+    this._weekday = weekday[this._getTime('day')];
+
     var flags = {
       yy: String(this._year).slice(2),
       yyyy: this._year,
@@ -427,7 +438,7 @@ DailyRotateFile.prototype.open = function (callback) {
     //
     return callback(true);
   } else if (!this._stream || (this.maxsize && this._size >= this.maxsize) ||
-      this._filenameHasExpired()) {
+    this._filenameHasExpired()) {
     //
     // If we dont have a stream or have exceeded our size, then create
     // the next stream and respond with a value indicating that
@@ -436,7 +447,7 @@ DailyRotateFile.prototype.open = function (callback) {
     callback(true);
     return this._createStream();
   }
-
+  this._archive = this.zippedArchive ? this._stream.path : false;
   //
   // Otherwise we have a valid (and ready) stream.
   //
@@ -562,6 +573,23 @@ DailyRotateFile.prototype._createStream = function () {
       // than one second.
       //
       self.flush();
+      compressFile();
+    }
+
+    function compressFile() {
+      var logfile = self._archive;
+      self._archive = false;
+      if (logfile && fs.existsSync(String(logfile))) {
+        var gzip = zlib.createGzip();
+
+        var inp = fs.createReadStream(String(logfile));
+        var out = fs.createWriteStream(logfile + '.gz');
+
+        inp.pipe(gzip).pipe(out);
+
+        self._created += 1;
+        fs.unlink(String(logfile));
+      }
     }
 
     fs.stat(fullname, function (err, stats) {
