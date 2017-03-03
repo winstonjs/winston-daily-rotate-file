@@ -654,4 +654,94 @@ describe('winston/transports/daily-rotate-file', function () {
       });
     });
   });
+
+  describe('when zippedArchive is true', function () {
+    var pattern = {
+      pattern: '.m',
+      start: 1861947160000, // GMT: Mon, 01 Jan 2029 07:32:50 GMT
+      mid: 1861947240000, // GMT: Mon, 01 Jan 2029 07:34:00 GMT
+      end: 1861947760000, // GMT: Mon, 01 Jan 2029 07:42:40 GMT
+      oldfile: 'test-rotation.log.32',
+      midfile: 'test-rotation.log.34',
+      newfile: 'test-rotation.log.42'
+    };
+
+    var transport;
+    var rotationLogPath = path.join(fixturesDir, 'rotations');
+    beforeEach(function (done) {
+      this.time = new Date(pattern.start);
+      tk.travel(this.time);
+      rimraf.sync(rotationLogPath);
+      mkdirp.sync(rotationLogPath);
+      transport = new DailyRotateFile({
+        filename: path.join(rotationLogPath, 'test-rotation.log'),
+        datePattern: pattern.pattern,
+        zippedArchive: true
+      });
+
+      done();
+    });
+
+    afterEach(function () {
+      tk.reset();
+    });
+
+    it('should compress logfile without adding count to file extension if there are no files with the same name', function (done) {
+      var self = this;
+
+      transport.log('error', 'test message', {}, function (err) {
+        if (err) {
+          done(err);
+        }
+        transport.log('error', 'test message', {}, function (err) {
+          if (err) {
+            done(err);
+          }
+
+          var filesCreated = fs.readdirSync(rotationLogPath);
+          expect(filesCreated.length).to.eql(1);
+          expect(filesCreated).to.include(pattern.oldfile);
+          self.time = new Date(pattern.mid);
+          tk.travel(self.time);
+          transport.log('error', '2nd test message', {}, function (err) {
+            if (err) {
+              done(err);
+            }
+            transport.log('error', 'test message', {}, function (err) {
+              if (err) {
+                done(err);
+              }
+
+              filesCreated = fs.readdirSync(rotationLogPath);
+              expect(filesCreated.length).to.eql(2);
+              expect(filesCreated).to.include(pattern.oldfile + '.gz');
+              expect(filesCreated).to.include(pattern.midfile);
+              self.time = new Date(pattern.end);
+              tk.travel(self.time);
+              transport.log('error', '3rd test message', {}, function (err) {
+                if (err) {
+                  done(err);
+                }
+                transport.log('error', 'test message', {}, function (err) {
+                  if (err) {
+                    done(err);
+                  }
+
+                  filesCreated = fs.readdirSync(rotationLogPath);
+                  expect(filesCreated.length).to.eql(3);
+                  expect(filesCreated).to.not.include(pattern.newfile + '.1');
+                  expect(filesCreated).to.include(pattern.newfile);
+                  expect(filesCreated).to.include(pattern.midfile + '.gz');
+                  expect(filesCreated).to.include(pattern.oldfile + '.gz');
+                  transport.close();
+
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
 });
