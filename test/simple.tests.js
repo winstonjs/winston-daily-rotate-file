@@ -686,6 +686,35 @@ describe('winston/transports/daily-rotate-file', function () {
       tk.reset();
     });
 
+    it('should compress logfile even if there is only one log message', function (done) {
+      var self = this;
+
+      transport.log('error', 'test message', {}, function (err) {
+        if (err) {
+          done(err);
+        }
+
+        var filesCreated = fs.readdirSync(rotationLogPath);
+        expect(filesCreated.length).to.eql(1);
+        expect(filesCreated).to.include(pattern.oldfile);
+        self.time = new Date(pattern.end);
+        tk.travel(self.time);
+        transport.log('error', '2nd test message', {}, function (err) {
+          if (err) {
+            done(err);
+          }
+
+          filesCreated = fs.readdirSync(rotationLogPath);
+          expect(filesCreated.length).to.eql(2);
+          expect(filesCreated).to.include(pattern.newfile);
+          expect(filesCreated).to.include(pattern.oldfile + '.gz');
+          transport.close();
+
+          done();
+        });
+      });
+    });
+
     it('should compress logfile without adding count to file extension if there are no files with the same name', function (done) {
       var self = this;
 

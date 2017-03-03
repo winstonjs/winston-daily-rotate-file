@@ -445,7 +445,7 @@ DailyRotateFile.prototype.open = function (callback) {
     callback(true);
     return this._createStream();
   }
-  this._archive = this.zippedArchive ? this._stream.path : false;
+
   //
   // Otherwise we have a valid (and ready) stream.
   //
@@ -519,13 +519,14 @@ DailyRotateFile.prototype._createStream = function () {
 
   (function checkFile(target) {
     var fullname = path.join(self.dirname, target);
-
     //
     // Creates the `WriteStream` and then flushes any
     // buffered messages.
     //
     function createAndFlush(size) {
       if (self._stream) {
+        self._archive = self.zippedArchive ? self._stream.path : false;
+
         self._stream.end();
         self._stream.destroySoon();
       }
