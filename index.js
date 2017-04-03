@@ -531,6 +531,21 @@ DailyRotateFile.prototype._createStream = function () {
         self._stream.destroySoon();
       }
 
+      // mkdir if options.datePattern contains path delimiter
+      if (target.indexOf('/') > -1) {
+        var targetpath = target.split('/');
+        for (var i = 1; i < targetpath.length; i++) {
+          var mkdirstep = path.join(self.dirname, targetpath.slice(0, i).join('/'));
+          try {
+            fs.mkdirSync(mkdirstep, '0744');
+          } catch (e) {
+            if (e.code !== 'EEXIST') {
+              throw e;
+            }
+          }
+        }
+      }
+
       self._size = size;
       self.filename = target;
       self._stream = fs.createWriteStream(fullname, self.options);
