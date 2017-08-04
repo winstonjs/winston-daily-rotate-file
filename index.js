@@ -80,6 +80,8 @@ var DailyRotateFile = module.exports = function (options) {
   this.prepend = options.prepend || false;
   this.localTime = options.localTime || false;
   this.zippedArchive = options.zippedArchive || false;
+  this.maxDays = options.maxDays || 0;
+
 
   if (this.json) {
     this.stringify = options.stringify;
@@ -437,6 +439,8 @@ DailyRotateFile.prototype.open = function (callback) {
     return callback(true);
   } else if (!this._stream || (this.maxsize && this._size >= this.maxsize) ||
     this._filenameHasExpired()) {
+
+    // this._cleanOldFiles();
     //
     // If we dont have a stream or have exceeded our size, then create
     // the next stream and respond with a value indicating that
@@ -772,3 +776,55 @@ DailyRotateFile.prototype._getTime = function (timeType) {
     return now.getUTCDay();
   }
 };
+
+
+// ### @private function _cleanOldFiles ()
+// Remove old log files
+// based on "maxDays" option
+DailyRotateFile.prototype._cleanOldFiles = function () {
+  var self = this;
+  var millisecondsInDay = 86400000;
+  var now = Date.now();
+
+  function removeOldFile(file) {
+    fs.unlink(self.dirname + path.sep + file, function (errUnlink) {
+      if (errUnlink) {
+        console.error('Error removing file ', file);
+      }
+    });
+  }
+
+  function tryToRemoveLogFile(file) {
+    var completeFileName = self.dirname + path.sep + file;
+    fs.stat(completeFileName, function(errStats, stats) {
+      if(errStats) {
+        console.error('Error stats file ', file, errStats);
+        return;
+      }
+
+      var lastChangeTimestamp = ((stats.mtime && stats.mtime.getTime()) || 0);
+      var lifeTime = now - lastChangeTimestamp;
+      if(stats.isFile() &&  lifeTime > (millisecondsInDay * self.maxDays)) {
+        removeOldFile(file);
+      }
+    });
+  }
+
+  // if not maxDays specified, do not remove old log files
+  if(self.maxDays) {
+    fs.readdir(self.dirname, function(err, files) {
+      if (err) {
+        console.error('Error reading directory ', self.dirname, err);
+        return;
+      }
+
+      var fileNameReg = new RegExp(self._basename, 'g');
+      files.forEach(function(file) {
+        if(/.log/.test(file) && fileNameReg.test(file)) {
+          tryToRemoveLogFile(file);
+        }
+      });
+    });
+  }
+}
+
