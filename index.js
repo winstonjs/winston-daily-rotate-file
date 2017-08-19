@@ -9,6 +9,7 @@ var Stream = require('stream').Stream;
 var os = require('os');
 var winston = require('winston');
 var zlib = require('zlib');
+var Moment = require('moment-timezone');
 
 var weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -80,6 +81,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.prepend = options.prepend || false;
   this.localTime = options.localTime || false;
   this.zippedArchive = options.zippedArchive || false;
+  this.timezone = options.timezone || Moment.tz.guess();
 
   if (this.json) {
     this.stringify = options.stringify;
@@ -375,7 +377,7 @@ DailyRotateFile.prototype.query = function (options, callback) {
       return;
     }
 
-    var time = new Date(log.timestamp);
+    var time = Moment.tz(log.timestamp, this.timezone).toDate();
     if ((options.from && time < options.from) ||
       (options.until && time > options.until)) {
       return;
@@ -741,7 +743,7 @@ DailyRotateFile.prototype._filenameHasExpired = function () {
 // based on localTime config
 //
 DailyRotateFile.prototype._getTime = function (timeType) {
-  var now = new Date();
+  var now = new Moment().tz(this.timezone).toDate();
 
   if (this.localTime) {
     if (timeType === 'year') {
