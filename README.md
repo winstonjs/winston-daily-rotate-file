@@ -32,6 +32,7 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
 * __prepend:__ Defines if the rolling time of the log file should be prepended at the beginning of the filename (default 'false').
 * __localTime:__ A boolean to define whether time stamps should be local (default 'false' means that UTC time will be used).
 * __zippedArchive:__ A boolean to define whether or not to gzip archived log files (default 'false').
+* __timezone:__ A string to set your timezone (we use 'moment-timezone' to due with timezone, if you don't set this value, we will use Moment.tz.guess() by default).
 
 Valid meta characters in the datePattern are:
 
