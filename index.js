@@ -11,7 +11,7 @@ var winston = require('winston');
 var zlib = require('zlib');
 
 var weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
+ 
 //
 // ### function DailyRotateFile (options)
 // #### @options {Object} Options for this instance.
@@ -285,105 +285,119 @@ DailyRotateFile.prototype.query = function (options, callback) {
     callback = options;
     options = {};
   }
+  let self = this;
 
   // TODO when maxfilesize rotate occurs
-  var file = path.join(this.dirname, this._getFilename());
-  options = this.normalizeQuery(options);
-  var buff = '';
+  let createdFiles = self._currentFiles; //already sorted chronologically
   var results = [];
   var row = 0;
+  options = self.normalizeQuery(options);
 
-  var stream = fs.createReadStream(file, {
-    encoding: 'utf8'
-  });
-
-  stream.on('error', function (err) {
-    if (stream.readable) {
-      stream.destroy();
-    }
-    if (!callback) {
+  //Edit so that all created files are read:
+  (function readNextFile(nextFile){
+    if(!nextFile)
       return;
-    }
-    return err.code === 'ENOENT' ? callback(null, results) : callback(err);
-  });
+    var file = path.join(self.dirname, nextFile); //this._getFilename()
+    var buff = '';
 
-  stream.on('data', function (data) {
-    data = (buff + data).split(/\n+/);
-    var l = data.length - 1;
-    var i = 0;
 
-    for (; i < l; i++) {
-      if (!options.start || row >= options.start) {
-        add(data[i]);
-      }
-      row++;
-    }
+    var stream = fs.createReadStream(file, {
+      encoding: 'utf8'
+    });
 
-    buff = data[l];
-  });
-
-  stream.on('close', function () {
-    if (buff) {
-      add(buff, true);
-    }
-    if (options.order === 'desc') {
-      results = results.reverse();
-    }
-    if (callback) {
-      callback(null, results);
-    }
-  });
-
-  function add(buff, attempt) {
-    try {
-      var log = JSON.parse(buff);
-      if (check(log)) {
-        push(log);
-      }
-    } catch (e) {
-      if (!attempt) {
-        stream.emit('error', e);
-      }
-    }
-  }
-
-  function push(log) {
-    if (options.rows && results.length >= options.rows) {
+    stream.on('error', function (err) {
       if (stream.readable) {
         stream.destroy();
       }
-      return;
+      if (!callback) {
+        return;
+      }
+      return err.code === 'ENOENT' ? callback(null, results) : callback(err);
+    });
+
+    stream.on('data', function (data) {
+      data = (buff + data).split(/\n+/);
+      var l = data.length - 1;
+      var i = 0;
+
+      for (; i < l; i++) {
+        if (!options.start || row >= options.start) {
+          add(data[i]);
+        }
+        row++;
+      }
+
+      buff = data[l];
+    });
+
+    stream.on('close', function () {
+      if (buff) {
+        add(buff, true);
+      }
+      if (options.order === 'desc') {
+        results = results.reverse();
+      }
+
+      if(createdFiles.length)
+        readNextFile(createdFiles.shift());
+      if (callback) {
+        callback(null, results);
+      }
+    });
+
+
+    function add(buff, attempt) {
+      try {
+        var log = JSON.parse(buff);
+        if (check(log)) {
+          push(log);
+        }
+      } catch (e) {
+        if (!attempt) {
+          stream.emit('error', e);
+        }
+      }
     }
 
-    if (options.fields) {
-      var obj = {};
-      options.fields.forEach(function (key) {
-        obj[key] = log[key];
-      });
-      log = obj;
+    function push(log) {
+      if (options.rows && results.length >= options.rows) {
+        if (stream.readable) {
+          stream.destroy();
+        }
+        return;
+      }
+
+      if (options.fields) {
+        var obj = {};
+        options.fields.forEach(function (key) {
+          obj[key] = log[key];
+        });
+        log = obj;
+      }
+
+      results.push(log);
     }
 
-    results.push(log);
-  }
+    function check(log) {
+      if (!log) {
+        return;
+      }
 
-  function check(log) {
-    if (!log) {
-      return;
+      if (typeof log !== 'object') {
+        return;
+      }
+
+      var time = new Date(log.timestamp);
+      if ((options.from && time < options.from) ||
+        (options.until && time > options.until)) {
+        return;
+      }
+
+      return true;
     }
+    })(createdFiles.shift());// executes the function
 
-    if (typeof log !== 'object') {
-      return;
-    }
-
-    var time = new Date(log.timestamp);
-    if ((options.from && time < options.from) ||
-      (options.until && time > options.until)) {
-      return;
-    }
-
-    return true;
-  }
-};
+}
 
 //
 // ### function stream (options)
