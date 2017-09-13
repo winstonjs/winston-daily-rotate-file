@@ -11,7 +11,7 @@ var winston = require('winston');
 var zlib = require('zlib');
 
 var weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
- 
+
 //
 // ### function DailyRotateFile (options)
 // #### @options {Object} Options for this instance.
@@ -285,21 +285,21 @@ DailyRotateFile.prototype.query = function (options, callback) {
     callback = options;
     options = {};
   }
-  let self = this;
+  var self = this;
 
   // TODO when maxfilesize rotate occurs
-  let createdFiles = self._currentFiles; //already sorted chronologically
+  var createdFiles = self._currentFiles; // already sorted chronologically
   var results = [];
   var row = 0;
   options = self.normalizeQuery(options);
 
-  //Edit so that all created files are read:
-  (function readNextFile(nextFile){
-    if(!nextFile)
+  // Edit so that all created files are read:
+  (function readNextFile(nextFile) {
+    if (!nextFile) {
       return;
-    var file = path.join(self.dirname, nextFile); //this._getFilename()
+    }
+    var file = path.join(self.dirname, nextFile);
     var buff = '';
-
 
     var stream = fs.createReadStream(file, {
       encoding: 'utf8'
@@ -338,13 +338,12 @@ DailyRotateFile.prototype.query = function (options, callback) {
         results = results.reverse();
       }
 
-      if(createdFiles.length)
+      if (createdFiles.length) {
         readNextFile(createdFiles.shift());
-      if (callback) {
+      } else if (callback) {
         callback(null, results);
       }
     });
-
 
     function add(buff, attempt) {
       try {
@@ -395,9 +394,8 @@ DailyRotateFile.prototype.query = function (options, callback) {
 
       return true;
     }
-    })(createdFiles.shift());// executes the function
-
-}
+  })(createdFiles.shift());// executes the function
+};
 
 //
 // ### function stream (options)
