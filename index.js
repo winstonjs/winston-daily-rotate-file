@@ -8,6 +8,7 @@ var Transport = require('winston').Transport;
 var Stream = require('stream').Stream;
 var os = require('os');
 var winston = require('winston');
+var mkdirp = require('mkdirp');
 var zlib = require('zlib');
 
 var weekday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -78,6 +79,7 @@ var DailyRotateFile = module.exports = function (options) {
   this.eol = options.eol || os.EOL;
   this.maxRetries = options.maxRetries || 2;
   this.prepend = options.prepend || false;
+  this.createTree = options.createTree || false;
   this.localTime = options.localTime || false;
   this.zippedArchive = options.zippedArchive || false;
   this.maxDays = options.maxDays || 0;
@@ -543,6 +545,10 @@ DailyRotateFile.prototype._createStream = function () {
 
         self._stream.end();
         self._stream.destroySoon();
+      }
+
+      if (self.createTree) {
+        mkdirp.sync(path.dirname(fullname));
       }
 
       self._size = size;

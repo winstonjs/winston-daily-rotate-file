@@ -43,6 +43,36 @@ describe('winston/transports/daily-rotate-file', function () {
   });
 
   describe('an instance of the transport', function () {
+    describe('with / characters in the datePattern', function () {
+      it('should create the full path', function (done) {
+        var now = moment();
+        var transport = new DailyRotateFile({
+          filename: path.join(fixturesDir, 'application'),
+          datePattern: '/yyyy/MM/dd.log',
+          createTree: true
+        });
+
+        transport.log('info', 'test message', {}, function (err) {
+          if (err) {
+            done(err);
+          }
+
+          fs.readFile(path.join(fixturesDir, 'application', now.format('YYYY'), now.format('MM'), now.format('DD') + '.log'), 'utf8', function (err, contents) {
+            if (err) {
+              done(err);
+            }
+
+            var lines = contents.split('\n').filter(function (n) {
+              return n !== '';
+            });
+
+            expect(lines.length).to.equal(1);
+            done();
+          });
+        });
+      });
+    });
+
     describe('with default datePatterns', function () {
       it('should have a proper filename when prepend option is false', function () {
         var now = moment().utc().format('YYYY-MM-DD');
