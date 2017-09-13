@@ -28,13 +28,13 @@
     "winston": "2.x"
   },
   "devDependencies": {
-    "chai": "3.5.0",
-    "eslint": "2.10.2",
-    "eslint-config-xo-space": "0.13.0",
-    "mkdirp": "0.5.1",
+    "chai": "^3.5.0",
+    "eslint": "^2.10.2",
+    "eslint-config-xo-space": "^0.13.0",
+    "mkdirp": "^0.5.1",
     "mocha": "2.4.5",
-    "moment": "2.13.0",
-    "rimraf": "2.5.2",
+    "moment": "^2.13.0",
+    "rimraf": "^2.5.2",
     "timekeeper": "^0.1.1"
   },
   "eslintConfig": {
@@ -43,5 +43,8 @@
       "node": true,
       "mocha": true
     }
+  },
+  "dependencies": {
+    "winston": "^2.3.1"
   }
 }
