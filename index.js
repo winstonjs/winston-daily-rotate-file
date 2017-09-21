@@ -366,7 +366,7 @@ DailyRotateFile.prototype.query = function (options, callback) {
     }
 
     function push(log) {
-      if (options.rows && results.length >= options.rows) {
+      if (options.rows && results.length >= options.rows && options.order !== 'desc') {
         if (stream.readable) {
           stream.destroy();
         }
@@ -381,6 +381,11 @@ DailyRotateFile.prototype.query = function (options, callback) {
         log = obj;
       }
 
+      if (options.order === 'desc') {
+        if (results.length >= options.rows) {
+          results.shift();
+        }
+      }
       results.push(log);
     }
 
