@@ -325,8 +325,9 @@ describe('winston/transports/daily-rotate-file', function () {
             done();
           });
 
-          afterEach(function () {
+          afterEach(function (done) {
             tk.reset();
+            done();
           });
 
           it('should create log with proper timestamp', function (done) {
@@ -400,8 +401,9 @@ describe('winston/transports/daily-rotate-file', function () {
           done();
         });
 
-        afterEach(function () {
+        afterEach(function (done) {
           tk.reset();
+          done();
         });
 
         it('should properly rotate log with old files getting deleted', function (done) {
