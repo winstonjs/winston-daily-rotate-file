@@ -296,6 +296,10 @@ DailyRotateFile.prototype.query = function (options, callback) {
   var row = 0;
   options = self.normalizeQuery(options);
 
+  if (createdFiles.length === 0 && callback) {
+    callback(null, results);
+  }
+
   // Edit so that all created files are read:
   (function readNextFile(nextFile) {
     if (!nextFile) {
