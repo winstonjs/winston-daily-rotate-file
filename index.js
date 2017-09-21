@@ -291,7 +291,7 @@ DailyRotateFile.prototype.query = function (options, callback) {
   var self = this;
 
   // TODO when maxfilesize rotate occurs
-  var createdFiles = self._currentFiles; // _currentFiles array is already sorted chronologically
+  var createdFiles = self._currentFiles.slice(0); // Clone already sorted _currentFiles array
   var results = [];
   var row = 0;
   options = self.normalizeQuery(options);
