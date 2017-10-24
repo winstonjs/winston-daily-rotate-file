@@ -32,7 +32,7 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
 * __prepend:__ Defines if the rolling time of the log file should be prepended at the beginning of the filename (default 'false').
 * __localTime:__ A boolean to define whether time stamps should be local (default 'false' means that UTC time will be used).
 * __zippedArchive:__ A boolean to define whether or not to gzip archived log files (default 'false').
-* __maxDays:__ A number representing the maximum number of days a log file will be saved. Any log file older than this specified number of days will be removed. If not value or a 0, no log files will be removed.
+* __maxDays:__ A number representing the maximum number of days a log file will be saved. Any log file older than this specified number of days will be removed. If not value or a 0, no log files will be removed (default 0).
 * __createTree:__ When combined with a `datePattern` that includes path delimiters, the transport will create the entire folder tree to the log file. Example: `datePattern: '/yyyy/MM/dd.log', createTree: true` will create the entire path to the log file prior to writing an entry.
 
 Valid meta characters in the datePattern are:
