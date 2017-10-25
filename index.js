@@ -612,9 +612,13 @@ DailyRotateFile.prototype._createStream = function () {
 
         var inp = fs.createReadStream(String(logfile));
         var out = fs.createWriteStream(logfile + '.gz');
-
-        inp.pipe(gzip).pipe(out);
-        fs.unlinkSync(String(logfile));
+        
+        inp.pipe(gzip).pipe(out).on('finish', function() {
+          
+          // Don't try to unlink the file until after it has been compressed.
+          fs.unlinkSync(String(logfile));
+        });
+        
       }
     }
 
