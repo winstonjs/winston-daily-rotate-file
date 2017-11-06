@@ -52,8 +52,10 @@ var LegacyDailyRotateFile = function (options) {
 
     this.options = Object.assign({}, loggerDefaults, options);
 
-    if (options.filename || options.dirname) {
-        throwIf('filename or dirname', 'stream');
+    if (options.stream) {
+        throwIf('stream', 'filename', 'maxsize');
+        this.logStream = options.stream;
+    } else {
         this.filename = options.filename ? path.basename(options.filename) : 'winston.log';
         this.dirname = options.dirname || path.dirname(options.filename);
 
@@ -94,11 +96,6 @@ var LegacyDailyRotateFile = function (options) {
                 });
             });
         }
-    } else if (options.stream) {
-        throwIf('stream', 'filename', 'maxsize');
-        this.logStream = options.stream;
-    } else {
-        throw new Error('Cannot log to file without filename or stream.');
     }
 };
 
