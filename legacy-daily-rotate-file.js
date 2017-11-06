@@ -86,6 +86,10 @@ var LegacyDailyRotateFile = function (options) {
             self.emit('open', fd);
         });
 
+        this.logStream.on('rotate', function (oldFile, newFile) {
+            self.emit('rotate', oldFile, newFile);
+        });
+
         if (options.zippedArchive) {
             this.logStream.on('rotate', function (oldFile) {
                 var gzip = zlib.createGzip();
