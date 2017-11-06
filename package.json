@@ -3,6 +3,9 @@
   "version": "2.0.0-beta",
   "description": "A transport for winston which logs to a rotating file each day.",
   "main": "index.js",
+  "engines": {
+    "node": ">=4"
+  },
   "scripts": {
     "test": "mocha && eslint .",
     "preversion": "npm test",
