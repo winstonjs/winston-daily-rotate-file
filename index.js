@@ -807,7 +807,7 @@ DailyRotateFile.prototype._getTime = function (timeType) {
 // based on "maxDays" option
 DailyRotateFile.prototype._cleanOldFiles = function () {
   var self = this;
-  var millisecondsInDay = 86400000;
+  var millisecondsInOneDay = 86400000;
   var now = Date.now();
 
   function removeOldFile(file) {
@@ -832,7 +832,7 @@ DailyRotateFile.prototype._cleanOldFiles = function () {
       var lastChangeTimestamp = ((stats.mtime && stats.mtime.getTime()) || 0);
       var lifeTime = now - lastChangeTimestamp;
 
-      if (stats.isFile() && lifeTime > (millisecondsInDay * self.maxDays)) {
+      if (stats.isFile() && lifeTime > (millisecondsInOneDay * self.maxDays)) {
         removeOldFile(file);
       }
     });
