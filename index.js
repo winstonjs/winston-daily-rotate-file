@@ -807,11 +807,13 @@ DailyRotateFile.prototype._getTime = function (timeType) {
 // based on "maxDays" option
 DailyRotateFile.prototype._cleanOldFiles = function () {
   var self = this;
-  var millisecondsInDay = 86400000;
+  var millisecondsInOneDay = 86400000;
   var now = Date.now();
 
   function removeOldFile(file) {
-    fs.unlink(self.dirname + path.sep + file, function (errUnlink) {
+    var completeFileName = path.join(self.dirname, file);
+
+    fs.unlink(completeFileName, function (errUnlink) {
       if (errUnlink) {
         console.error('Error removing file ', file);
       }
@@ -819,7 +821,8 @@ DailyRotateFile.prototype._cleanOldFiles = function () {
   }
 
   function tryToRemoveLogFile(file) {
-    var completeFileName = self.dirname + path.sep + file;
+    var completeFileName = path.join(self.dirname, file);
+
     fs.stat(completeFileName, function (errStats, stats) {
       if (errStats) {
         console.error('Error stats file ', file, errStats);
@@ -828,7 +831,8 @@ DailyRotateFile.prototype._cleanOldFiles = function () {
 
       var lastChangeTimestamp = ((stats.mtime && stats.mtime.getTime()) || 0);
       var lifeTime = now - lastChangeTimestamp;
-      if (stats.isFile() && lifeTime > (millisecondsInDay * self.maxDays)) {
+
+      if (stats.isFile() && lifeTime > (millisecondsInOneDay * self.maxDays)) {
         removeOldFile(file);
       }
     });
@@ -842,10 +846,10 @@ DailyRotateFile.prototype._cleanOldFiles = function () {
         return;
       }
 
-      var fileNameReg = new RegExp(self._basename, 'g');
       files.forEach(function (file) {
-        if (/.log/.test(file) && fileNameReg.test(file)) {
-          tryToRemoveLogFile(file);
+        // for self._basename as "myapp.log", it catchs 'myapp.log', 'myapp.log.1', 'myapp.log.21.09.2017'
+        if (file.startsWith(self._basename)) {
+          tryToRemoveLogFile();
         }
       });
     });
