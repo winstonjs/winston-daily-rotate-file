@@ -1,7 +1,7 @@
 'use strict';
 
 var winston = require('winston');
-var LegacyDailyRotateFile = require('./legacy-daily-rotate-file');
+var DailyRotateFile = require('./daily-rotate-file');
 
-winston.transports.DailyRotateFile = LegacyDailyRotateFile;
-module.exports = LegacyDailyRotateFile;
+winston.transports.DailyRotateFile = DailyRotateFile;
+module.exports = DailyRotateFile;

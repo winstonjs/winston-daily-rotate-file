@@ -6,6 +6,10 @@ node_js:
   - "6"
   - "8"
 
+env:
+  - WINSTON_VER=winston@^2
+  - WINSTON_VER=winston@next
+
 before_install:
-  - "npm install winston@^2"
+  - npm install $WINSTON_VER
 

@@ -6,32 +6,44 @@ var path = require('path');
 var expect = require('chai').expect;
 var rimraf = require('rimraf');
 var moment = require('moment');
+var semver = require('semver');
+var winston = require('winston');
 var MemoryStream = require('./memory-stream');
 var randomString = require('./random-string');
-var LegacyDailyRotateFile = require('../legacy-daily-rotate-file');
+var DailyRotateFile = require('../daily-rotate-file');
+
+function sendLogItem(transport, level, message, meta, cb) { // eslint-disable-line max-params
+    if (semver.major(winston.version) === 2) {
+        transport.log(level, message, meta);
+    } else {
+        transport.log({
+            level: level,
+            message: message
+        }, cb);
+    }
+}
 
 describe('winston/transports/daily-rotate-file', function () {
     beforeEach(function () {
         this.stream = new MemoryStream();
-        this.transport = new LegacyDailyRotateFile({
+        this.transport = new DailyRotateFile({
             json: true,
             stream: this.stream
         });
     });
 
     it('should have the proper methods defined', function () {
-        var transport = new LegacyDailyRotateFile({stream: new MemoryStream()});
-        expect(transport).to.be.instanceOf(LegacyDailyRotateFile);
+        var transport = new DailyRotateFile({stream: new MemoryStream()});
+        expect(transport).to.be.instanceOf(DailyRotateFile);
         expect(transport).to.respondTo('log');
         expect(transport).to.respondTo('query');
     });
 
     it('should write to the stream', function (done) {
         var self = this;
-        this.transport.log('info', 'this message should write to the stream', {}, function (err, logged) {
+        sendLogItem(this.transport, 'info', 'this message should write to the stream', {}, function (err, logged) {
             expect(err).to.be.null;
             expect(logged).to.be.true;
-            console.lo;
             var logEntry = JSON.parse(self.stream.toString());
             expect(logEntry.level).to.equal('info');
             expect(logEntry.message).to.equal('this message should write to the stream');
@@ -52,7 +64,7 @@ describe('winston/transports/daily-rotate-file', function () {
 
         Object.keys(params).forEach(function (param) {
             it('should accept log messages with ' + param + ' metadata', function (done) {
-                this.transport.log('info', 'test log message', params[param], function (err, logged) {
+                sendLogItem(this.transport, 'info', 'test log message', params[param], function (err, logged) {
                     expect(err).to.be.null;
                     expect(logged).to.be.true;
                     // TODO parse the metadata value to make sure its set properly
@@ -76,7 +88,7 @@ describe('winston/transports/daily-rotate-file', function () {
         beforeEach(function (done) {
             var self = this;
             rimraf(logDir, function () {
-                self.transport = new LegacyDailyRotateFile(options);
+                self.transport = new DailyRotateFile(options);
                 done();
             });
         });
@@ -92,7 +104,7 @@ describe('winston/transports/daily-rotate-file', function () {
                 done();
             });
 
-            this.transport.log('info', 'this message should write to the file', {}, function (err, logged) {
+            sendLogItem(this.transport, 'info', 'this message should write to the file', {}, function (err, logged) {
                 expect(err).to.be.null;
                 expect(logged).to.be.true;
             });
@@ -104,7 +116,7 @@ describe('winston/transports/daily-rotate-file', function () {
             var opts = Object.assign({}, options);
             opts.stream = new MemoryStream();
             expect(function () {
-                var transport = new LegacyDailyRotateFile(opts);
+                var transport = new DailyRotateFile(opts);
                 expect(transport).to.not.be.null;
             }).to.throw();
         });
@@ -116,7 +128,7 @@ describe('winston/transports/daily-rotate-file', function () {
                 opts.zippedArchive = true;
                 opts.maxSize = '1k';
 
-                this.transport = new LegacyDailyRotateFile(opts);
+                this.transport = new DailyRotateFile(opts);
 
                 this.transport.on('finish', function () {
                     fs.readdir(logDir, function (err, files) {
@@ -126,8 +138,8 @@ describe('winston/transports/daily-rotate-file', function () {
                         done();
                     });
                 });
-                this.transport.log('info', randomString(1056));
-                this.transport.log('info', randomString(1056));
+                sendLogItem(this.transport, 'info', randomString(1056));
+                sendLogItem(this.transport, 'info', randomString(1056));
                 self.transport.close();
             });
         });
@@ -142,16 +154,16 @@ describe('winston/transports/daily-rotate-file', function () {
 
             it('should raise error when calling with stream', function () {
                 expect(function () {
-                    var transport = new LegacyDailyRotateFile({stream: new MemoryStream()});
+                    var transport = new DailyRotateFile({stream: new MemoryStream()});
                     transport.query(null);
                 }).to.throw();
             });
 
             it('should return log entries that match the query', function (done) {
-                this.transport.log('info', randomString(1056));
-                this.transport.log('info', randomString(1056));
-                this.transport.log('info', randomString(1056));
-                this.transport.log('info', randomString(1056));
+                sendLogItem(this.transport, 'info', randomString(1056));
+                sendLogItem(this.transport, 'info', randomString(1056));
+                sendLogItem(this.transport, 'info', randomString(1056));
+                sendLogItem(this.transport, 'info', randomString(1056));
 
                 this.transport.close();
 

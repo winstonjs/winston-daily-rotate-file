@@ -4,10 +4,11 @@ var fs = require('fs');
 var os = require('os');
 var path = require('path');
 var util = require('util');
-var winston = require('winston');
-var common = require('winston/lib/winston/common');
-var Transport = winston.Transport;
+var semver = require('semver');
 var zlib = require('zlib');
+var winston = require('winston');
+var compat = require('winston-compat');
+var Transport = semver.major(winston.version) === 2 ? compat.Transport : require('winston-transport');
 
 var loggerDefaults = {
     json: false,
@@ -19,10 +20,12 @@ var loggerDefaults = {
     stringify: false,
     depth: null,
     showLevel: true,
-    timestamp: true
+    timestamp: function () {
+        return new Date().toISOString();
+    }
 };
 
-var LegacyDailyRotateFile = function (options) {
+var DailyRotateFile = function (options) {
     if (!options) {
         options = {};
     }
@@ -103,36 +106,46 @@ var LegacyDailyRotateFile = function (options) {
     }
 };
 
-module.exports = LegacyDailyRotateFile;
+module.exports = DailyRotateFile;
 
-util.inherits(LegacyDailyRotateFile, Transport);
+util.inherits(DailyRotateFile, Transport);
 
-LegacyDailyRotateFile.prototype.name = 'dailyRotateFile';
+DailyRotateFile.prototype.name = 'dailyRotateFile';
 
-LegacyDailyRotateFile.prototype.log = function (level, msg, meta, callback) {
-    var self = this;
+if (semver.major(winston.version) === 2) {
+    DailyRotateFile.prototype.log = function (level, msg, meta, callback) {
+        var options = Object.assign({}, this.options, {
+            level: level,
+            message: msg,
+            meta: meta
+        });
 
-    var options = Object.assign({}, self.options, {
-        level: level,
-        message: msg,
-        meta: meta
-    });
+        this._internalLog(options, callback);
+    };
+} else {
+    DailyRotateFile.prototype.normalizeQuery = compat.Transport.prototype.normalizeQuery;
+    DailyRotateFile.prototype.log = function (info, callback) {
+        var options = Object.assign({}, this.options, info);
+        this._internalLog(options, callback);
+    };
+}
 
-    var output = common.log(options) + options.eol;
-    self.logStream.write(output);
-
+DailyRotateFile.prototype._internalLog = function (options, callback) {
+    var opts = Object.assign({}, this.options, options);
+    var output = compat.log(opts) + this.options.eol;
+    this.logStream.write(output);
     if (callback) {
         callback(null, true);
     }
 };
 
-LegacyDailyRotateFile.prototype.close = function () {
+DailyRotateFile.prototype.close = function () {
     if (this.logStream) {
         this.logStream.end();
     }
 };
 
-LegacyDailyRotateFile.prototype.query = function (options, callback) {
+DailyRotateFile.prototype.query = function (options, callback) {
     if (typeof options === 'function') {
         callback = options;
         options = {};
