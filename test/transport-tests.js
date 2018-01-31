@@ -14,7 +14,7 @@ var DailyRotateFile = require('../daily-rotate-file');
 
 function sendLogItem(transport, level, message, meta, cb) { // eslint-disable-line max-params
     if (semver.major(winston.version) === 2) {
-        transport.log(level, message, meta);
+        transport.log(level, message, meta, cb);
     } else {
         transport.log({
             level: level,
