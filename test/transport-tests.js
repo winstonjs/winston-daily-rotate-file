@@ -16,10 +16,20 @@ function sendLogItem(transport, level, message, meta, cb) { // eslint-disable-li
     if (semver.major(winston.version) === 2) {
         transport.log(level, message, meta, cb);
     } else {
-        transport.log({
+        var logger = winston.createLogger({
+            transports: [transport]
+        });
+
+        transport.on('logged', function () {
+            if (cb) {
+                cb(null, true);
+            }
+        });
+
+        logger.info({
             level: level,
             message: message
-        }, cb);
+        });
     }
 }
 

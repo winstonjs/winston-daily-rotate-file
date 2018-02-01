@@ -8,6 +8,7 @@ var semver = require('semver');
 var zlib = require('zlib');
 var winston = require('winston');
 var compat = require('winston-compat');
+var PassThrough = require('stream').PassThrough;
 var Transport = semver.major(winston.version) === 2 ? compat.Transport : require('winston-transport');
 
 var loggerDefaults = {
@@ -26,10 +27,7 @@ var loggerDefaults = {
 };
 
 var DailyRotateFile = function (options) {
-    if (!options) {
-        options = {};
-    }
-
+    options = options || {};
     Transport.call(this, options);
 
     function throwIf(target /* , illegal... */) {
@@ -57,7 +55,8 @@ var DailyRotateFile = function (options) {
 
     if (options.stream) {
         throwIf('stream', 'filename', 'maxsize');
-        this.logStream = options.stream;
+        this.logStream = new PassThrough();
+        this.logStream.pipe(options.stream);
     } else {
         this.filename = options.filename ? path.basename(options.filename) : 'winston.log';
         this.dirname = options.dirname || path.dirname(options.filename);
@@ -112,32 +111,31 @@ util.inherits(DailyRotateFile, Transport);
 
 DailyRotateFile.prototype.name = 'dailyRotateFile';
 
+var noop = function () {};
 if (semver.major(winston.version) === 2) {
     DailyRotateFile.prototype.log = function (level, msg, meta, callback) {
+        callback = callback || noop;
         var options = Object.assign({}, this.options, {
             level: level,
             message: msg,
             meta: meta
         });
 
-        this._internalLog(options, callback);
+        var output = compat.log(options) + options.eol;
+        this.logStream.write(output);
+        callback(null, true);
     };
 } else {
     DailyRotateFile.prototype.normalizeQuery = compat.Transport.prototype.normalizeQuery;
     DailyRotateFile.prototype.log = function (info, callback) {
-        var options = Object.assign({}, this.options, info);
-        this._internalLog(options, callback);
+        var MESSAGE = Symbol.for('message');
+        callback = callback || noop;
+
+        this.logStream.write(info[MESSAGE] + this.options.eol);
+        this.emit('logged', info);
+        callback(null, true);
     };
 }
-
-DailyRotateFile.prototype._internalLog = function (options, callback) {
-    var opts = Object.assign({}, this.options, options);
-    var output = compat.log(opts) + this.options.eol;
-    this.logStream.write(output);
-    if (callback) {
-        callback(null, true);
-    }
-};
 
 DailyRotateFile.prototype.close = function () {
     if (this.logStream) {
