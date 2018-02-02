@@ -8,6 +8,7 @@ var semver = require('semver');
 var zlib = require('zlib');
 var winston = require('winston');
 var compat = require('winston-compat');
+var {MESSAGE} = require('triple-beam');
 var PassThrough = require('stream').PassThrough;
 var Transport = semver.major(winston.version) === 2 ? compat.Transport : require('winston-transport');
 
@@ -128,7 +129,6 @@ if (semver.major(winston.version) === 2) {
 } else {
     DailyRotateFile.prototype.normalizeQuery = compat.Transport.prototype.normalizeQuery;
     DailyRotateFile.prototype.log = function (info, callback) {
-        var MESSAGE = Symbol.for('message');
         callback = callback || noop;
 
         this.logStream.write(info[MESSAGE] + this.options.eol);
