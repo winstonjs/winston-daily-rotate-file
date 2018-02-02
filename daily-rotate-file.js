@@ -8,7 +8,7 @@ var semver = require('semver');
 var zlib = require('zlib');
 var winston = require('winston');
 var compat = require('winston-compat');
-var {MESSAGE} = require('triple-beam');
+var MESSAGE = require('triple-beam').MESSAGE;
 var PassThrough = require('stream').PassThrough;
 var Transport = semver.major(winston.version) === 2 ? compat.Transport : require('winston-transport');
 
