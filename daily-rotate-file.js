@@ -73,22 +73,6 @@ var DailyRotateFile = function (options) {
             max_logs: options.maxFiles
         });
 
-        this.logStream.on('close', function () {
-            self.emit('close');
-        });
-
-        this.logStream.on('finish', function () {
-            self.emit('finish');
-        });
-
-        this.logStream.on('error', function (err) {
-            self.emit('error', err);
-        });
-
-        this.logStream.on('open', function (fd) {
-            self.emit('open', fd);
-        });
-
         this.logStream.on('rotate', function (oldFile, newFile) {
             self.emit('rotate', oldFile, newFile);
         });
@@ -137,9 +121,14 @@ if (semver.major(winston.version) === 2) {
     };
 }
 
-DailyRotateFile.prototype.close = function () {
+DailyRotateFile.prototype.end = function (chunk, encoding, callback) {
+    var self = this;
     if (this.logStream) {
-        this.logStream.end();
+        this.logStream.end(chunk, encoding, function () {
+            self.emit('finish');
+            callback = callback || noop;
+            callback();
+        });
     }
 };
 

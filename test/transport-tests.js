@@ -119,7 +119,7 @@ describe('winston/transports/daily-rotate-file', function () {
                 expect(logged).to.be.true;
             });
 
-            this.transport.close();
+            this.transport.end();
         });
 
         it('should not allow the stream to be set', function () {
@@ -150,7 +150,7 @@ describe('winston/transports/daily-rotate-file', function () {
                 });
                 sendLogItem(this.transport, 'info', randomString(1056));
                 sendLogItem(this.transport, 'info', randomString(1056));
-                self.transport.close();
+                self.transport.end();
             });
         });
 
@@ -175,8 +175,6 @@ describe('winston/transports/daily-rotate-file', function () {
                 sendLogItem(this.transport, 'info', randomString(1056));
                 sendLogItem(this.transport, 'info', randomString(1056));
 
-                this.transport.close();
-
                 var self = this;
                 this.transport.on('finish', function () {
                     self.transport.query(function (err, results) {
@@ -185,6 +183,8 @@ describe('winston/transports/daily-rotate-file', function () {
                         done();
                     });
                 });
+
+                this.transport.end();
             });
         });
     });
