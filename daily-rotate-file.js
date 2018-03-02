@@ -121,11 +121,13 @@ if (semver.major(winston.version) === 2) {
     };
 }
 
-DailyRotateFile.prototype._final = function (callback) {
-    this.logStream.end(function () {
-        callback = callback || noop;
-        callback();
-    });
+DailyRotateFile.prototype.close = function () {
+    var self = this;
+    if (this.logStream) {
+        this.logStream.end(function () {
+            self.emit('finish');
+        });
+    }
 };
 
 DailyRotateFile.prototype.query = function (options, callback) {
