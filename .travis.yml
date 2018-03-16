@@ -2,6 +2,14 @@
 sudo: false
 language: node_js
 node_js:
-  - "0.10"
-  - "0.12"
-  - "4.1"
+  - "4"
+  - "6"
+  - "8"
+
+env:
+  - WINSTON_VER=winston@^2
+  - WINSTON_VER=winston@next
+
+before_install:
+  - npm install $WINSTON_VER
+
