@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/winstonjs/winston-daily-rotate-file#readme",
   "peerDependencies": {
-    "winston": "^2 <= 3.0.0-rc3 || ^3"
+    "winston": "^2 <= 3.0.0-rc9 || ^3"
   },
   "devDependencies": {
     "chai": "3.5.0",
