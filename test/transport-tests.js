@@ -49,6 +49,15 @@ describe('winston/transports/daily-rotate-file', function () {
         expect(transport).to.respondTo('query');
     });
 
+    it('should not allow invalid characters in the filename', function () {
+        expect(function () {
+            // eslint-disable-next-line no-new
+            new DailyRotateFile({
+                filename: 'test\0log.log'
+            });
+        }).to.throw();
+    });
+
     it('should write to the stream', function (done) {
         var self = this;
         sendLogItem(this.transport, 'info', 'this message should write to the stream', {}, function (err, logged) {
