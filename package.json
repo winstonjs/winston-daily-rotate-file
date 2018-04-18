@@ -1,6 +1,6 @@
 {
   "name": "winston-daily-rotate-file",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "A transport for winston which logs to a rotating file each day.",
   "main": "index.js",
   "engines": {
