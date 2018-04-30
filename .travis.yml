@@ -2,9 +2,9 @@
 sudo: false
 language: node_js
 node_js:
-  - "4"
   - "6"
   - "8"
+  - "10"
 
 env:
   - WINSTON_VER=winston@^2
