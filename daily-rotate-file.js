@@ -160,7 +160,6 @@ DailyRotateFile.prototype.query = function (options, callback) {
 
     var self = this;
     var results = [];
-    var row = 0;
     options = self.normalizeQuery(options);
 
     var logFiles = (function () {
@@ -200,10 +199,7 @@ DailyRotateFile.prototype.query = function (options, callback) {
             var l = data.length - 1;
 
             for (var i = 0; i < l; i++) {
-                if (!options.start || row >= options.start) {
-                    add(data[i]);
-                }
-                row++;
+                add(data[i]);
             }
 
             buff = data[l];
@@ -214,13 +210,34 @@ DailyRotateFile.prototype.query = function (options, callback) {
                 add(buff, true);
             }
 
-            if (options.order === 'desc') {
-                results = results.reverse();
-            }
-
             if (logFiles.length) {
                 processLogFile(logFiles.shift());
             } else if (callback) {
+                results.sort(function (a, b) {
+                    var d1 = new Date(a.timestamp).getTime();
+                    var d2 = new Date(b.timestamp).getTime();
+
+                    return d1 > d2 ? 1 : d1 < d2 ? -1 : 0;
+                });
+
+                if (options.order === 'desc') {
+                    results = results.reverse();
+                }
+
+                var start = options.start || 0;
+                var limit = options.limit || results.length;
+
+                results = results.slice(start, start + limit);
+
+                if (options.fields) {
+                    results = results.map(function (log) {
+                        var obj = {};
+                        options.fields.forEach(function (key) {
+                            obj[key] = log[key];
+                        });
+                        return obj;
+                    });
+                }
                 callback(null, results);
             }
         });
@@ -228,51 +245,21 @@ DailyRotateFile.prototype.query = function (options, callback) {
         function add(buff, attempt) {
             try {
                 var log = JSON.parse(buff);
-                if (check(log)) {
-                    push(log);
+                if (!log || typeof log !== 'object') {
+                    return;
                 }
+
+                var time = new Date(log.timestamp);
+                if ((options.from && time < options.from) || (options.until && time > options.until)) {
+                    return;
+                }
+
+                results.push(log);
             } catch (e) {
                 if (!attempt) {
                     stream.emit('error', e);
                 }
             }
-        }
-
-        function check(log) {
-            if (!log || typeof log !== 'object') {
-                return;
-            }
-
-            var time = new Date(log.timestamp);
-            if ((options.from && time < options.from) || (options.until && time > options.until)) {
-                return;
-            }
-
-            return true;
-        }
-
-        function push(log) {
-            if (options.rows && results.length >= options.rows && options.order !== 'desc') {
-                if (stream.readable) {
-                    stream.destroy();
-                }
-                return;
-            }
-
-            if (options.fields) {
-                var obj = {};
-                options.fields.forEach(function (key) {
-                    obj[key] = log[key];
-                });
-                log = obj;
-            }
-
-            if (options.order === 'desc') {
-                if (results.length >= options.rows) {
-                    results.shift();
-                }
-            }
-            results.push(log);
         }
     })(logFiles.shift());
 };
