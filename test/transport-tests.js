@@ -198,6 +198,15 @@ describe('winston/transports/daily-rotate-file', function () {
                 }).to.throw();
             });
 
+            it('should raise error when calling with json set to false', function () {
+                expect(function () {
+                    var opts = Object.assign({}, options);
+                    opts.json = false;
+                    var transport = new DailyRotateFile(opts);
+                    transport.query(null);
+                }).to.throw();
+            });
+
             it('should return log entries that match the query', function (done) {
                 sendLogItem(this.transport, 'info', randomString(1056));
                 sendLogItem(this.transport, 'info', randomString(1056));

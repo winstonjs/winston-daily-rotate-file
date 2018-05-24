@@ -150,6 +150,10 @@ DailyRotateFile.prototype.query = function (options, callback) {
         options = {};
     }
 
+    if (!this.options.json) {
+        throw new Error('query() may not be used without the json option being set to true');
+    }
+
     if (!this.filename) {
         throw new Error('query() may not be used when initializing with a stream');
     }
