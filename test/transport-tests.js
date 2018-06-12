@@ -12,7 +12,11 @@ var MemoryStream = require('./memory-stream');
 var randomString = require('./random-string');
 var DailyRotateFile = require('../daily-rotate-file');
 
-function sendLogItem(transport, level, message, meta, cb) { // eslint-disable-line max-params
+function sendLogItem(transport, info, cb) {
+    var level = info.level;
+    var message = info.message;
+    var meta = info.meta;
+
     if (semver.major(winston.version) === 2) {
         transport.log(level, message, meta, cb);
     } else {
@@ -26,10 +30,7 @@ function sendLogItem(transport, level, message, meta, cb) { // eslint-disable-li
             }
         });
 
-        logger.info({
-            level: level,
-            message: message
-        });
+        logger.log(info);
     }
 }
 
@@ -80,7 +81,11 @@ describe('winston/transports/daily-rotate-file', function () {
 
     it('should write to the stream', function (done) {
         var self = this;
-        sendLogItem(this.transport, 'info', 'this message should write to the stream', {}, function (err, logged) {
+        var info = {
+            level: 'info',
+            message: 'this message should write to the stream'
+        };
+        sendLogItem(this.transport, info, function (err, logged) {
             expect(err).to.be.null;
             expect(logged).to.be.true;
             var logEntry = JSON.parse(self.stream.toString());
@@ -101,9 +106,15 @@ describe('winston/transports/daily-rotate-file', function () {
             circular: circular
         };
 
+        var info = {
+            level: 'info',
+            message: 'test log message'
+        };
+
         Object.keys(params).forEach(function (param) {
             it('should accept log messages with ' + param + ' metadata', function (done) {
-                sendLogItem(this.transport, 'info', 'test log message', params[param], function (err, logged) {
+                info.meta = params[param];
+                sendLogItem(this.transport, info, function (err, logged) {
                     expect(err).to.be.null;
                     expect(logged).to.be.true;
                     // TODO parse the metadata value to make sure its set properly
@@ -143,7 +154,12 @@ describe('winston/transports/daily-rotate-file', function () {
                 done();
             });
 
-            sendLogItem(this.transport, 'info', 'this message should write to the file', {}, function (err, logged) {
+            var info = {
+                level: 'info',
+                message: 'this message should write to the file'
+            };
+
+            sendLogItem(this.transport, info, function (err, logged) {
                 expect(err).to.be.null;
                 expect(logged).to.be.true;
             });
@@ -177,8 +193,8 @@ describe('winston/transports/daily-rotate-file', function () {
                         done();
                     });
                 });
-                sendLogItem(this.transport, 'info', randomString(1056));
-                sendLogItem(this.transport, 'info', randomString(1056));
+                sendLogItem(this.transport, {level: 'info', message: randomString(1056)});
+                sendLogItem(this.transport, {level: 'info', message: randomString(1056)});
                 self.transport.close();
             });
         });
@@ -208,10 +224,10 @@ describe('winston/transports/daily-rotate-file', function () {
             });
 
             it('should return log entries that match the query', function (done) {
-                sendLogItem(this.transport, 'info', randomString(1056));
-                sendLogItem(this.transport, 'info', randomString(1056));
-                sendLogItem(this.transport, 'info', randomString(1056));
-                sendLogItem(this.transport, 'info', randomString(1056));
+                sendLogItem(this.transport, {level: 'info', message: randomString(1056)});
+                sendLogItem(this.transport, {level: 'info', message: randomString(1056)});
+                sendLogItem(this.transport, {level: 'info', message: randomString(1056)});
+                sendLogItem(this.transport, {level: 'info', message: randomString(1056)});
 
                 var self = this;
                 this.transport.on('finish', function () {
