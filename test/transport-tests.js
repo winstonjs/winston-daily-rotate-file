@@ -8,6 +8,7 @@ var rimraf = require('rimraf');
 var moment = require('moment');
 var semver = require('semver');
 var winston = require('winston');
+var format = winston.format;
 var MemoryStream = require('./memory-stream');
 var randomString = require('./random-string');
 var DailyRotateFile = require('../daily-rotate-file');
@@ -37,10 +38,21 @@ function sendLogItem(transport, info, cb) {
 describe('winston/transports/daily-rotate-file', function () {
     beforeEach(function () {
         this.stream = new MemoryStream();
-        this.transport = new DailyRotateFile({
+        var opts = {
             json: true,
             stream: this.stream
-        });
+        };
+
+        if (semver.major(winston.version) >= 3) {
+            opts.format = format.combine(
+                format(function (info) {
+                    return info.private ? false : info;
+                })(),
+                format.timestamp({format: 'YYYY-MM-DDTHH:mm:ss.sss'})
+            );
+        }
+
+        this.transport = new DailyRotateFile(opts);
     });
 
     it('should have the proper methods defined', function () {
@@ -94,6 +106,24 @@ describe('winston/transports/daily-rotate-file', function () {
             done();
         });
     });
+
+    if (semver.major(winston.version) >= 3) {
+        it('should not write to the file with a false-y format result', function (done) {
+            var self = this;
+            var info = {
+                level: 'info',
+                message: 'this message should not write to the file',
+                private: true
+            };
+
+            sendLogItem(this.transport, info, function (err, logged) {
+                expect(err).to.be.null;
+                expect(logged).to.be.true;
+                expect(self.stream.toString()).to.be.empty;
+                done();
+            });
+        });
+    }
 
     describe('when passed metadata', function () {
         var circular = {};
