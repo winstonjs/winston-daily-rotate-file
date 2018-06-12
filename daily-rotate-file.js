@@ -129,8 +129,16 @@ if (semver.major(winston.version) === 2) {
     DailyRotateFile.prototype.log = function (info, callback) {
         callback = callback || noop;
 
+        var self = this;
+        setImmediate(function () {
+            self.emit('logged', info);
+        });
+
+        if (!info) {
+            return callback ? callback() : false;
+        }
+
         this.logStream.write(info[MESSAGE] + this.options.eol);
-        this.emit('logged', info);
         callback(null, true);
     };
 }
