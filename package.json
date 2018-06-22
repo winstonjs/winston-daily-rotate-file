@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/winstonjs/winston-daily-rotate-file#readme",
   "peerDependencies": {
-    "winston": "^2 <= 3.0.0-rc9 || ^3"
+    "winston": "^2 <= ^3"
   },
   "devDependencies": {
     "chai": "3.5.0",
@@ -41,8 +41,8 @@
   "dependencies": {
     "file-stream-rotator": "^0.2.1",
     "semver": "^5.5.0",
-    "triple-beam": "^1.1.0",
-    "winston-compat": "^0.1.3",
-    "winston-transport": "^3.2.1"
+    "triple-beam": "^1.3.0",
+    "winston-compat": "^0.1.4",
+    "winston-transport": "^4.2.0"
   }
 }
