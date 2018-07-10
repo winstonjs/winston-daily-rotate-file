@@ -42,10 +42,10 @@ declare module "winston-daily-rotate-file" {
     }
 
     interface DailyRotateFileTransportInstance extends Transport {
-        filename?: string;
-        dirname?: string;
-        logStream?: NodeJS.WritableStream;
-        options?: DailyRotateFileTransportOptions;
+        filename: string;
+        dirname: string;
+        logStream: NodeJS.WritableStream;
+        options: DailyRotateFileTransportOptions;
 
         new (options?: DailyRotateFileTransportOptions): DailyRotateFileTransportInstance;
     }
