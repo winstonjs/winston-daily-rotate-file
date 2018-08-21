@@ -68,16 +68,6 @@ describe('winston/transports/daily-rotate-file', function () {
         }).to.throw();
     });
 
-    it('should allow valid characters in the dirname', function () {
-        expect(function () {
-            // eslint-disable-next-line no-new
-            new DailyRotateFile({
-                dirname: 'C:\\application\\logs',
-                filename: 'test_%DATE%.log'
-            });
-        }).to.not.throw();
-    });
-
     it('should write to the stream', function (done) {
         var self = this;
         sendLogItem(this.transport, 'info', 'this message should write to the stream', {}, function (err, logged) {
