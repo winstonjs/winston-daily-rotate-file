@@ -6,6 +6,7 @@ var path = require('path');
 var util = require('util');
 var semver = require('semver');
 var zlib = require('zlib');
+var hash = require('object-hash');
 var winston = require('winston');
 var compat = require('winston-compat');
 var MESSAGE = require('triple-beam').MESSAGE;
@@ -85,7 +86,8 @@ var DailyRotateFile = function (options) {
             verbose: false,
             size: getMaxSize(options.maxSize),
             max_logs: options.maxFiles,
-            end_stream: true
+            end_stream: true,
+            audit_file: path.join(self.dirname, '.' + hash(options) + '-audit.json')
         });
 
         this.logStream.on('rotate', function (oldFile, newFile) {
