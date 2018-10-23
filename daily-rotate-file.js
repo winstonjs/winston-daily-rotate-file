@@ -98,6 +98,12 @@ var DailyRotateFile = function (options) {
             this.logStream.on('rotate', function (oldFile) {
                 var gzip = zlib.createGzip();
                 var inp = fs.createReadStream(oldFile);
+                inp.on('error', function () {
+                    var zipExist = fs.createReadStream(oldFile + '.gz');
+                    zipExist.on('error', function () {
+                        throw new Error('File ' + oldFile + 'does not exist');
+                    });
+                });
                 var out = fs.createWriteStream(oldFile + '.gz');
                 inp.pipe(gzip).pipe(out).on('finish', function () {
                     fs.unlinkSync(oldFile);
