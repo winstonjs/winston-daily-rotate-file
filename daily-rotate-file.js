@@ -96,16 +96,17 @@ var DailyRotateFile = function (options) {
 
         if (options.zippedArchive) {
             this.logStream.on('rotate', function (oldFile) {
-                var gzip = zlib.createGzip();
                 var oldFileExist = fs.existsSync(oldFile);
                 var gzExist = fs.existsSync(oldFile + '.gz');
-                if (oldFileExist && !gzExist) {
-                    var inp = fs.createReadStream(oldFile);
-                    var out = fs.createWriteStream(oldFile + '.gz');
-                    inp.pipe(gzip).pipe(out).on('finish', function () {
-                        fs.unlinkSync(oldFile);
-                    });
+                if (!oldFileExist || gzExist) {
+                    return;
                 }
+                var gzip = zlib.createGzip();
+                var inp = fs.createReadStream(oldFile);
+                var out = fs.createWriteStream(oldFile + '.gz');
+                inp.pipe(gzip).pipe(out).on('finish', function () {
+                    fs.unlinkSync(oldFile);
+                });
             });
         }
     }
