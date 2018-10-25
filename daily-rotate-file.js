@@ -96,6 +96,11 @@ var DailyRotateFile = function (options) {
 
         if (options.zippedArchive) {
             this.logStream.on('rotate', function (oldFile) {
+                var oldFileExist = fs.existsSync(oldFile);
+                var gzExist = fs.existsSync(oldFile + '.gz');
+                if (!oldFileExist || gzExist) {
+                    return;
+                }
                 var gzip = zlib.createGzip();
                 var inp = fs.createReadStream(oldFile);
                 var out = fs.createWriteStream(oldFile + '.gz');
