@@ -39,6 +39,11 @@ declare module "winston-daily-rotate-file" {
          * Maximum number of logs to keep. If not set, no logs will be removed. This can be a number of files or number of days. If using days, add 'd' as the suffix. (default: null)
          */
         maxFiles?: string | number;
+
+        /**
+         * An object resembling https://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options indicating additional options that should be passed to the file stream. (default: `{ flags: 'a' }`)
+         */
+        options?: string | object;
     }
 
     interface DailyRotateFileTransportInstance extends Transport {
