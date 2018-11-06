@@ -1,3 +1,4 @@
+import * as Transport from 'winston-transport';
 declare namespace DailyRotateFile {
     interface DailyRotateFileTransportOptions extends Transport.TransportStreamOptions {
       json?: boolean;
