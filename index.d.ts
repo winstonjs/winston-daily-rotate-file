@@ -1,5 +1,9 @@
-declare module "winston-daily-rotate-file" {
-    import * as Transport from "winston-transport";
+import * as Transport from "winston-transport";
+
+declare class DailyRotateFile implements DailyRotateFileTransportInstance {
+}
+
+declare namespace DailyRotateFile {
 
     interface DailyRotateFileTransportOptions extends Transport.TransportStreamOptions {
         json?: boolean;
@@ -54,8 +58,6 @@ declare module "winston-daily-rotate-file" {
 
         new (options?: DailyRotateFileTransportOptions): DailyRotateFileTransportInstance;
     }
-
-    const DailyRotateFile: DailyRotateFileTransportInstance;
-
-    export = DailyRotateFile;
 }
+
+export = DailyRotateFile;
