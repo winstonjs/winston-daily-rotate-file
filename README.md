@@ -40,7 +40,7 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
     // do something fun
   });
 
-  var logger = new (winston.Logger)({
+  var logger = winston.createLogger({
     transports: [
       transport
     ]
