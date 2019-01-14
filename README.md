@@ -14,6 +14,7 @@ npm install winston-daily-rotate-file
 ## Options
 The DailyRotateFile transport can rotate files by minute, hour, day, month, year or weekday. In addition to the options accepted by the logger, `winston-daily-rotate-file` also accepts the following options:
 
+* **frequency:** A string representing the frequency of rotation. This is useful if you want to have timed rotations, as opposed to rotations that happen at specific moments in time. Valid values are '#m' or '#h' (e.g., '5m' or '3h'). Leaving this null relies on `datePattern` for the rotation times. (default: null)
 * **datePattern:** A string representing the [moment.js date format](http://momentjs.com/docs/#/displaying/format/) to be used for rotating. The meta characters used in this string will dictate the frequency of the file rotation. For example, if your datePattern is simply 'HH' you will end up with 24 log files that are picked up and appended to every day. (default 'YYYY-MM-DD')
 * **zippedArchive:** A boolean to define whether or not to gzip archived log files. (default 'false')
 * **filename:** Filename to be used to log to. This filename can include the `%DATE%` placeholder which will include the formatted datePattern at that point in the filename. (default: 'winston.log.%DATE%)

@@ -81,7 +81,7 @@ var DailyRotateFile = function (options) {
 
         this.logStream = require('file-stream-rotator').getStream({
             filename: path.join(this.dirname, this.filename),
-            frequency: 'custom',
+            frequency: options.frequency ? options.frequency : 'custom',
             date_format: options.datePattern ? options.datePattern : 'YYYY-MM-DD',
             verbose: false,
             size: getMaxSize(options.maxSize),
