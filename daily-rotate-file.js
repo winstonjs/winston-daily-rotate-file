@@ -87,7 +87,7 @@ var DailyRotateFile = function (options) {
             size: getMaxSize(options.maxSize),
             max_logs: options.maxFiles,
             end_stream: true,
-            audit_file: path.join(self.dirname, '.' + hash(options) + '-audit.json'),
+            audit_file: options.auditFile ? options.auditFile : path.join(self.dirname, '.' + hash(options) + '-audit.json'),
             file_options: options.options ? options.options : {flags: 'a'}
         });
 
