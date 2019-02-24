@@ -107,6 +107,7 @@ var DailyRotateFile = function (options) {
                 var out = fs.createWriteStream(oldFile + '.gz');
                 inp.pipe(gzip).pipe(out).on('finish', function () {
                     fs.unlinkSync(oldFile);
+                    self.emit('archive', oldFile + '.gz');
                 });
             });
         }

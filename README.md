@@ -51,7 +51,7 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
   logger.info('Hello World!');
 ```
 
-You can listen for the *rotate* custom event. The rotate event will pass two parameters to the callback (*oldFilename*, *newFilename*).
+You can listen for the *rotate* custom event. The rotate event will pass two parameters to the callback (*oldFilename*, *newFilename*). You can also listen for the *archive* custom event. The archive event will pass one parameter to the callback (*zipFilename*).
 
 ## LICENSE
 MIT
