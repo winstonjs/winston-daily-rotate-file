@@ -190,9 +190,16 @@ DailyRotateFile.prototype.query = function (options, callback) {
         var logFile = path.join(self.dirname, file);
         var buff = '';
 
-        var stream = fs.createReadStream(logFile, {
-            encoding: 'utf8'
-        });
+        var stream;
+
+        if (file.endsWith('.gz')) {
+            stream = new PassThrough();
+            fs.createReadStream(logFile).pipe(zlib.createGunzip()).pipe(stream);
+        } else {
+            stream = fs.createReadStream(logFile, {
+                encoding: 'utf8'
+            });
+        }
 
         stream.on('error', function (err) {
             if (stream.readable) {
@@ -215,7 +222,7 @@ DailyRotateFile.prototype.query = function (options, callback) {
             buff = data[l];
         });
 
-        stream.on('close', function () {
+        stream.on('end', function () {
             if (buff) {
                 add(buff, true);
             }
