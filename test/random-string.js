@@ -14,6 +14,7 @@ module.exports = function (maxLen) {
     if (maxLen < minLen) {
         throw new Error('length must be >= ' + minLen);
     }
+
     var str = '';
     var usedClasses = {};
     var charClass;
@@ -25,5 +26,6 @@ module.exports = function (maxLen) {
         }
         // Ensure we have picked from every char class.
     } while (Object.keys(usedClasses).length !== charClasses.length);
+
     return str;
 };

@@ -50,6 +50,7 @@ var DailyRotateFile = function (options) {
             var sizeK = Math.round(size / 1024);
             return sizeK === 0 ? '1k' : sizeK + 'k';
         }
+
         return null;
     }
 
@@ -106,6 +107,7 @@ var DailyRotateFile = function (options) {
                 if (!oldFileExist || gzExist) {
                     return;
                 }
+
                 var gzip = zlib.createGzip();
                 var inp = fs.createReadStream(oldFile);
                 var out = fs.createWriteStream(oldFile + '.gz');
@@ -191,6 +193,7 @@ DailyRotateFile.prototype.query = function (options, callback) {
         if (!file) {
             return;
         }
+
         var logFile = path.join(self.dirname, file);
         var buff = '';
 
@@ -209,9 +212,11 @@ DailyRotateFile.prototype.query = function (options, callback) {
             if (stream.readable) {
                 stream.destroy();
             }
+
             if (!callback) {
                 return;
             }
+
             return err.code === 'ENOENT' ? callback(null, results) : callback(err);
         });
 
@@ -259,6 +264,7 @@ DailyRotateFile.prototype.query = function (options, callback) {
                         return obj;
                     });
                 }
+
                 callback(null, results);
             }
         });
