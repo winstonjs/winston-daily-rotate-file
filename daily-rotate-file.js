@@ -91,6 +91,10 @@ var DailyRotateFile = function (options) {
             file_options: options.options ? options.options : {flags: 'a'}
         });
 
+        this.logStream.on('new', function (newFile) {
+            self.emit('new', newFile);
+        });
+
         this.logStream.on('rotate', function (oldFile, newFile) {
             self.emit('rotate', oldFile, newFile);
         });
