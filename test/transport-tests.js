@@ -150,6 +150,16 @@ describe('winston/transports/daily-rotate-file', function () {
             }).to.throw();
         });
 
+        it('should raise the new event for a new log file', function (done) {
+            this.transport.on('new', function (newFile) {
+                expect(newFile).to.equal(filename);
+                done();
+            });
+
+            sendLogItem(this.transport, 'info', 'this message should write to the file');
+            this.transport.close();
+        });
+
         describe('when setting zippedArchive', function () {
             it('should archive the log after rotating', function (done) {
                 var self = this;
@@ -234,7 +244,6 @@ describe('winston/transports/daily-rotate-file', function () {
                         done();
                     });
                 });
-                this.transport.close();
             });
         });
     });
