@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/winstonjs/winston-daily-rotate-file#readme",
   "peerDependencies": {
-    "winston": "^2 || ^3"
+    "winston": "^3"
   },
   "devDependencies": {
     "chai": "4.2.0",
