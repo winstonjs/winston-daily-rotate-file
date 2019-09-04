@@ -45,6 +45,16 @@ declare module "winston-daily-rotate-file" {
            * An object resembling https://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options indicating additional options that should be passed to the file stream. (default: `{ flags: 'a' }`)
            */
           options?: string | object;
+
+          /**
+           * A string representing the name of the name of the audit file. (default: './hash-audit.json' )
+           */
+          auditFile?: string
+
+          /**
+           * A string representing the frequency of rotation. (default: 'custom')
+           */
+          frequency?: string
       }
   }
 
