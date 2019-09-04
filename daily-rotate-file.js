@@ -97,6 +97,10 @@ var DailyRotateFile = function (options) {
             self.emit('rotate', oldFile, newFile);
         });
 
+        this.logStream.on('logRemoved', function (params) {
+            self.emit('logRemoved', params.name);
+        });
+
         if (options.zippedArchive) {
             this.logStream.on('rotate', function (oldFile) {
                 var oldFileExist = fs.existsSync(oldFile);

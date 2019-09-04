@@ -154,9 +154,25 @@ describe('winston/transports/daily-rotate-file', function () {
             this.transport.close();
         });
 
+        it('should raise the logRemoved event when pruning old log files', function (done) {
+            var opts = Object.assign({}, options);
+            opts.maxSize = '1k';
+            opts.maxFiles = 1;
+
+            this.transport = new DailyRotateFile(opts);
+
+            this.transport.on('logRemoved', function (removedFilename) {
+                expect(removedFilename).to.equal(filename);
+                done();
+            });
+
+            sendLogItem(this.transport, 'info', randomString(1056));
+            sendLogItem(this.transport, 'info', randomString(1056));
+            this.transport.close();
+        });
+
         describe('when setting zippedArchive', function () {
             it('should archive the log after rotating', function (done) {
-                var self = this;
                 var opts = Object.assign({}, options);
                 opts.zippedArchive = true;
                 opts.maxSize = '1k';
@@ -173,7 +189,7 @@ describe('winston/transports/daily-rotate-file', function () {
                 });
                 sendLogItem(this.transport, 'info', randomString(1056));
                 sendLogItem(this.transport, 'info', randomString(1056));
-                self.transport.close();
+                this.transport.close();
             });
         });
     });

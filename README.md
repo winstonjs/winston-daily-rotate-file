@@ -54,7 +54,12 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
   logger.info('Hello World!');
 ```
 
-This transport emits three custom events: *new*, *rotate*, and *archive*. You can listen for the *new* custom event, which is fired when a new log file is created. The new event will pass one parameter to the callback (*newFilename*). You can listen for the *rotate* custom event, which is fired when the log file is rotated. The rotate event will pass two parameters to the callback (*oldFilename*, *newFilename*). You can also listen for the *archive* custom event, which is fired when the log file is archived. The archive event will pass one parameter to the callback (*zipFilename*).
+This transport emits the following custom events:
+
+* *new*: fired when a new log file is created. This event will pass one parameter to the callback (*newFilename*).
+* *rotate*: fired when the log file is rotated. This event will pass two parameters to the callback (*oldFilename*, *newFilename*).
+* *archive*: fired when the log file is archived. This event will pass one parameter to the callback (*zipFilename*).
+* *logRemoved*: fired when a log file is removed from the file system. This event will pass one parameter to the callback (*removedFilename*).
 
 ## LICENSE
 MIT
