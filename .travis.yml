@@ -6,7 +6,6 @@ node_js:
   - "10"
 
 env:
-  - WINSTON_VER=winston@2
   - WINSTON_VER=winston@3
 
 before_install:
