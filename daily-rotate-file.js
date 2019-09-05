@@ -86,7 +86,8 @@ var DailyRotateFile = function (options) {
             max_logs: options.maxFiles,
             end_stream: true,
             audit_file: options.auditFile ? options.auditFile : path.join(self.dirname, '.' + hash(options) + '-audit.json'),
-            file_options: options.options ? options.options : {flags: 'a'}
+            file_options: options.options ? options.options : {flags: 'a'},
+            utc: options.utc ? options.utc : false
         });
 
         this.logStream.on('new', function (newFile) {
