@@ -100,13 +100,14 @@ describe('winston/transports/daily-rotate-file', function () {
     describe('when using a filename or dirname', function () {
         var logDir = path.join(__dirname, 'logs');
         var now = moment().utc().format('YYYY-MM-DD-HH');
-        var filename = path.join(logDir, 'application-' + now + '.log');
+        var filename = path.join(logDir, 'application-' + now + '.testlog');
         var options = {
             json: true,
             dirname: logDir,
-            filename: 'application-%DATE%.log',
+            filename: 'application-%DATE%',
             datePattern: 'YYYY-MM-DD-HH',
-            utc: true
+            utc: true,
+            extension: '.testlog'
         };
 
         beforeEach(function (done) {
