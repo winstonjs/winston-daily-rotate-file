@@ -55,6 +55,11 @@ declare module "winston-daily-rotate-file" {
            * A string representing the frequency of rotation. (default: 'custom')
            */
           frequency?: string
+
+          /**
+           * A boolean whether or not to generate file name from "datePattern" in UTC format. (default: false)
+           */
+          utc?: boolean;
       }
   }
 
