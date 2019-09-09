@@ -47,14 +47,24 @@ declare module "winston-daily-rotate-file" {
           options?: string | object;
 
           /**
-           * A string representing the name of the name of the audit file. (default: './hash-audit.json' )
+           * A string representing the name of the name of the audit file. (default: './hash-audit.json')
            */
-          auditFile?: string
+          auditFile?: string;
 
           /**
            * A string representing the frequency of rotation. (default: 'custom')
            */
-          frequency?: string
+          frequency?: string;
+
+          /**
+           * A boolean whether or not to generate file name from "datePattern" in UTC format. (default: false)
+           */
+          utc?: boolean;
+
+          /**
+           * A string representing an extension to be added to the filename, if not included in the filename property. (default: '')
+           */
+          extension?: string;
       }
   }
 

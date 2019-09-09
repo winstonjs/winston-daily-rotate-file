@@ -99,13 +99,15 @@ describe('winston/transports/daily-rotate-file', function () {
 
     describe('when using a filename or dirname', function () {
         var logDir = path.join(__dirname, 'logs');
-        var now = moment().format('YYYY-MM-DD-HH');
-        var filename = path.join(logDir, 'application-' + now + '.log');
+        var now = moment().utc().format('YYYY-MM-DD-HH');
+        var filename = path.join(logDir, 'application-' + now + '.testlog');
         var options = {
             json: true,
             dirname: logDir,
-            filename: 'application-%DATE%.log',
-            datePattern: 'YYYY-MM-DD-HH'
+            filename: 'application-%DATE%',
+            datePattern: 'YYYY-MM-DD-HH',
+            utc: true,
+            extension: '.testlog'
         };
 
         beforeEach(function (done) {
@@ -154,9 +156,25 @@ describe('winston/transports/daily-rotate-file', function () {
             this.transport.close();
         });
 
+        it('should raise the logRemoved event when pruning old log files', function (done) {
+            var opts = Object.assign({}, options);
+            opts.maxSize = '1k';
+            opts.maxFiles = 1;
+
+            this.transport = new DailyRotateFile(opts);
+
+            this.transport.on('logRemoved', function (removedFilename) {
+                expect(removedFilename).to.equal(filename);
+                done();
+            });
+
+            sendLogItem(this.transport, 'info', randomString(1056));
+            sendLogItem(this.transport, 'info', randomString(1056));
+            this.transport.close();
+        });
+
         describe('when setting zippedArchive', function () {
             it('should archive the log after rotating', function (done) {
-                var self = this;
                 var opts = Object.assign({}, options);
                 opts.zippedArchive = true;
                 opts.maxSize = '1k';
@@ -173,7 +191,7 @@ describe('winston/transports/daily-rotate-file', function () {
                 });
                 sendLogItem(this.transport, 'info', randomString(1056));
                 sendLogItem(this.transport, 'info', randomString(1056));
-                self.transport.close();
+                this.transport.close();
             });
         });
     });
