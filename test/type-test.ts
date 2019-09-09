@@ -1,19 +1,19 @@
 import winston from 'winston';
-import DailyRotateFile from '../';
+import DailyRotateFileTransport, { DailyRotateFileTransportOptions } from '../';
 import * as fs from 'fs';
 
 const ws = fs.createWriteStream('.');
 
-const transport = new DailyRotateFile({
+const transport = new DailyRotateFileTransport({
     filename: './asdf%DATE%.log',
     options: {},
 });
 
-const transport1 = new DailyRotateFile({
+const transport1 = new DailyRotateFileTransport({
     stream: ws,
-});
+} as DailyRotateFileTransportOptions);
 
-const transport2 = new (winston.transports.DailyRotateFile)({
+const transport2 = new (winston.transports.DailyRotateFileTransport)({
     filename: '.',
 });
 
