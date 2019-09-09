@@ -88,7 +88,9 @@ var DailyRotateFile = function (options) {
             audit_file: options.auditFile ? options.auditFile : path.join(self.dirname, '.' + hash(options) + '-audit.json'),
             file_options: options.options ? options.options : {flags: 'a'},
             utc: options.utc ? options.utc : false,
-            extension: options.extension ? options.extension : ''
+            extension: options.extension ? options.extension : '',
+            create_symlink: options.createSymlink ? options.createSymlink : false,
+            symlink_name: options.symlinkName ? options.symlinkName : 'current.log'
         });
 
         this.logStream.on('new', function (newFile) {
