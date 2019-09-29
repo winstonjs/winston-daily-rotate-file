@@ -1,4 +1,4 @@
-import TransportStream from "winston-transport";
+import TransportStream = require("winston-transport");
 
 // referenced from https://stackoverflow.com/questions/40510611/typescript-interface-require-one-of-two-properties-to-exist
 type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
@@ -12,95 +12,97 @@ type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
 // merging into winston.transports
 declare module 'winston/lib/winston/transports' {
     interface Transports {
-        DailyRotateFileTransport: typeof DailyRotateFileTransport;
-        DailyRotateFileTransportOptions: DailyRotateFileTransportOptions;
+        DailyRotateFileTransport: typeof DailyRotateFile;
+        DailyRotateFileTransportOptions: DailyRotateFile.DailyRotateFileTransportOptions;
     }
 }
 
-export type DailyRotateFileTransportOptions = RequireOnlyOne<GeneralDailyRotateFileTransportOptions, 'filename' | 'stream'>;
+declare namespace DailyRotateFile {
+    type DailyRotateFileTransportOptions = RequireOnlyOne<GeneralDailyRotateFileTransportOptions, 'filename' | 'stream'>;
 
-interface GeneralDailyRotateFileTransportOptions extends TransportStream.TransportStreamOptions {
-    json?: boolean;
-    eol?: string;
+    interface GeneralDailyRotateFileTransportOptions extends TransportStream.TransportStreamOptions {
+        json?: boolean;
+        eol?: string;
 
-    /**
-     * A string representing the moment.js date format to be used for rotating. The meta characters used in this string will dictate the frequency of the file rotation. For example, if your datePattern is simply 'HH' you will end up with 24 log files that are picked up and appended to every day. (default 'YYYY-MM-DD')
-     */
-    datePattern?: string;
+        /**
+         * A string representing the moment.js date format to be used for rotating. The meta characters used in this string will dictate the frequency of the file rotation. For example, if your datePattern is simply 'HH' you will end up with 24 log files that are picked up and appended to every day. (default 'YYYY-MM-DD')
+         */
+        datePattern?: string;
 
-    /**
-     * A boolean to define whether or not to gzip archived log files. (default 'false')
-     */
-    zippedArchive?: boolean;
+        /**
+         * A boolean to define whether or not to gzip archived log files. (default 'false')
+         */
+        zippedArchive?: boolean;
 
-    /**
-     * Filename to be used to log to. This filename can include the %DATE% placeholder which will include the formatted datePattern at that point in the filename. (default: 'winston.log.%DATE%)
-     */
-    filename?: string;
+        /**
+         * Filename to be used to log to. This filename can include the %DATE% placeholder which will include the formatted datePattern at that point in the filename. (default: 'winston.log.%DATE%)
+         */
+        filename?: string;
 
-    /**
-     * The directory name to save log files to. (default: '.')
-     */
-    dirname?: string;
+        /**
+         * The directory name to save log files to. (default: '.')
+         */
+        dirname?: string;
 
-    /**
-     * Write directly to a custom stream and bypass the rotation capabilities. (default: null)
-     */
-    stream?: NodeJS.WritableStream;
+        /**
+         * Write directly to a custom stream and bypass the rotation capabilities. (default: null)
+         */
+        stream?: NodeJS.WritableStream;
 
-    /**
-     * Maximum size of the file after which it will rotate. This can be a number of bytes, or units of kb, mb, and gb. If using the units, add 'k', 'm', or 'g' as the suffix. The units need to directly follow the number. (default: null)
-     */
-    maxSize?: string | number;
+        /**
+         * Maximum size of the file after which it will rotate. This can be a number of bytes, or units of kb, mb, and gb. If using the units, add 'k', 'm', or 'g' as the suffix. The units need to directly follow the number. (default: null)
+         */
+        maxSize?: string | number;
 
-    /**
-     * Maximum number of logs to keep. If not set, no logs will be removed. This can be a number of files or number of days. If using days, add 'd' as the suffix. (default: null)
-     */
-    maxFiles?: string | number;
+        /**
+         * Maximum number of logs to keep. If not set, no logs will be removed. This can be a number of files or number of days. If using days, add 'd' as the suffix. (default: null)
+         */
+        maxFiles?: string | number;
 
-    /**
-     * An object resembling https://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options indicating additional options that should be passed to the file stream. (default: `{ flags: 'a' }`)
-     */
-    options?: string | object;
+        /**
+         * An object resembling https://nodejs.org/api/fs.html#fs_fs_createwritestream_path_options indicating additional options that should be passed to the file stream. (default: `{ flags: 'a' }`)
+         */
+        options?: string | object;
 
-    /**
-     * A string representing the name of the name of the audit file. (default: './hash-audit.json')
-     */
-    auditFile?: string;
+        /**
+         * A string representing the name of the name of the audit file. (default: './hash-audit.json')
+         */
+        auditFile?: string;
 
-    /**
-     * A string representing the frequency of rotation. (default: 'custom')
-     */
-    frequency?: string;
+        /**
+         * A string representing the frequency of rotation. (default: 'custom')
+         */
+        frequency?: string;
 
-    /**
-     * A boolean whether or not to generate file name from "datePattern" in UTC format. (default: false)
-     */
-    utc?: boolean;
+        /**
+         * A boolean whether or not to generate file name from "datePattern" in UTC format. (default: false)
+         */
+        utc?: boolean;
 
-    /**
-     * A string representing an extension to be added to the filename, if not included in the filename property. (default: '')
-     */
-    extension?: string;
+        /**
+         * A string representing an extension to be added to the filename, if not included in the filename property. (default: '')
+         */
+        extension?: string;
 
-    /**
-      * Create a tailable symlink to the current active log file. (default: false)
-      */
-    createSymlink?: boolean;
+        /**
+         * Create a tailable symlink to the current active log file. (default: false)
+         */
+        createSymlink?: boolean;
 
-    /**
-      * The name of the tailable symlink. (default: 'current.log')
-      */
-    symlinkName?: string;
+        /**
+         * The name of the tailable symlink. (default: 'current.log')
+         */
+        symlinkName?: string;
+    }
 }
 
-declare class DailyRotateFileTransport extends TransportStream {
+declare class DailyRotateFile extends TransportStream {
     filename: string;
     dirname: string;
     logStream: NodeJS.WritableStream;
-    options: DailyRotateFileTransportOptions;
+    options: DailyRotateFile.DailyRotateFileTransportOptions;
 
-    constructor(options: DailyRotateFileTransportOptions);
+    constructor(options?: DailyRotateFile.DailyRotateFileTransportOptions);
 }
 
-export default DailyRotateFileTransport;
+export = DailyRotateFile;
