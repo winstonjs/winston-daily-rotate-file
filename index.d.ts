@@ -12,7 +12,7 @@ type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
 // merging into winston.transports
 declare module 'winston/lib/winston/transports' {
     interface Transports {
-        DailyRotateFileTransport: typeof DailyRotateFile;
+        DailyRotateFile: typeof DailyRotateFile;
         DailyRotateFileTransportOptions: DailyRotateFile.DailyRotateFileTransportOptions;
     }
 }
