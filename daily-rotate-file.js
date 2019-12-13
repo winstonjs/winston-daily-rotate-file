@@ -156,3 +156,155 @@ DailyRotateFile.prototype.close = function () {
         });
     }
 };
+
+DailyRotateFile.prototype.query = function (options, callback) {
+    if (typeof options === 'function') {
+        callback = options;
+        options = {};
+    }
+
+    if (!this.options.json) {
+        throw new Error('query() may not be used without the json option being set to true');
+    }
+
+    if (!this.filename) {
+        throw new Error('query() may not be used when initializing with a stream');
+    }
+
+    var self = this;
+    var results = [];
+    options = options || {};
+
+    // limit
+    options.rows = options.rows || options.limit || 10;
+
+    // starting row offset
+    options.start = options.start || 0;
+
+    // now
+    options.until = options.until || new Date;
+    if (typeof options.until !== 'object') {
+        options.until = new Date(options.until);
+    }
+
+    // now - 24
+    options.from = options.from || (options.until - (24 * 60 * 60 * 1000));
+    if (typeof options.from !== 'object') {
+        options.from = new Date(options.from);
+    }
+
+    // 'asc' or 'desc'
+    options.order = options.order || 'desc';
+
+    var logFiles = (function () {
+        var fileRegex = new RegExp(self.filename.replace('%DATE%', '.*'), 'i');
+        return fs.readdirSync(self.dirname).filter(function (file) {
+            return path.basename(file).match(fileRegex);
+        });
+    })();
+
+    if (logFiles.length === 0 && callback) {
+        callback(null, results);
+    }
+
+    (function processLogFile(file) {
+        if (!file) {
+            return;
+        }
+
+        var logFile = path.join(self.dirname, file);
+        var buff = '';
+
+        var stream;
+
+        if (file.endsWith('.gz')) {
+            stream = new PassThrough();
+            fs.createReadStream(logFile).pipe(zlib.createGunzip()).pipe(stream);
+        } else {
+            stream = fs.createReadStream(logFile, {
+                encoding: 'utf8'
+            });
+        }
+
+        stream.on('error', function (err) {
+            if (stream.readable) {
+                stream.destroy();
+            }
+
+            if (!callback) {
+                return;
+            }
+
+            return err.code === 'ENOENT' ? callback(null, results) : callback(err);
+        });
+
+        stream.on('data', function (data) {
+            data = (buff + data).split(/\n+/);
+            var l = data.length - 1;
+
+            for (var i = 0; i < l; i++) {
+                add(data[i]);
+            }
+
+            buff = data[l];
+        });
+
+        stream.on('end', function () {
+            if (buff) {
+                add(buff, true);
+            }
+
+            if (logFiles.length) {
+                processLogFile(logFiles.shift());
+            } else if (callback) {
+                results.sort(function (a, b) {
+                    var d1 = new Date(a.timestamp).getTime();
+                    var d2 = new Date(b.timestamp).getTime();
+
+                    return d1 > d2 ? 1 : d1 < d2 ? -1 : 0;
+                });
+
+                if (options.order === 'desc') {
+                    results = results.reverse();
+                }
+
+                var start = options.start || 0;
+                var limit = options.limit || results.length;
+
+                results = results.slice(start, start + limit);
+
+                if (options.fields) {
+                    results = results.map(function (log) {
+                        var obj = {};
+                        options.fields.forEach(function (key) {
+                            obj[key] = log[key];
+                        });
+                        return obj;
+                    });
+                }
+
+                callback(null, results);
+            }
+        });
+
+        function add(buff, attempt) {
+            try {
+                var log = JSON.parse(buff);
+                if (!log || typeof log !== 'object') {
+                    return;
+                }
+
+                var time = new Date(log.timestamp);
+                if ((options.from && time < options.from) || (options.until && time > options.until)) {
+                    return;
+                }
+
+                results.push(log);
+            } catch (e) {
+                if (!attempt) {
+                    stream.emit('error', e);
+                }
+            }
+        }
+    })(logFiles.shift());
+};

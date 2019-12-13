@@ -41,6 +41,7 @@ describe('winston/transports/daily-rotate-file', function () {
         var transport = new DailyRotateFile({stream: new MemoryStream()});
         expect(transport).to.be.instanceOf(DailyRotateFile);
         expect(transport).to.respondTo('log');
+        expect(transport).to.respondTo('query');
     });
 
     it('should not allow invalid characters in the filename', function () {
@@ -192,6 +193,70 @@ describe('winston/transports/daily-rotate-file', function () {
                 sendLogItem(this.transport, 'info', randomString(1056));
                 sendLogItem(this.transport, 'info', randomString(1056));
                 this.transport.close();
+            });
+        });
+
+        describe('query', function () {
+            it('should call callback when no files are present', function () {
+                this.transport.query(function (err, results) {
+                    expect(results).to.not.be.null;
+                    expect(results.length).to.equal(0);
+                });
+            });
+
+            it('should raise error when calling with stream', function () {
+                expect(function () {
+                    var transport = new DailyRotateFile({stream: new MemoryStream()});
+                    transport.query(null);
+                }).to.throw();
+            });
+
+            it('should raise error when calling with json set to false', function () {
+                expect(function () {
+                    var opts = Object.assign({}, options);
+                    opts.json = false;
+                    var transport = new DailyRotateFile(opts);
+                    transport.query(null);
+                }).to.throw();
+            });
+
+            it('should return log entries that match the query', function (done) {
+                sendLogItem(this.transport, 'info', randomString(1056));
+                sendLogItem(this.transport, 'info', randomString(1056));
+                sendLogItem(this.transport, 'info', randomString(1056));
+                sendLogItem(this.transport, 'info', randomString(1056));
+
+                var self = this;
+                this.transport.on('finish', function () {
+                    self.transport.query(function (err, results) {
+                        expect(results).to.not.be.null;
+                        expect(results.length).to.equal(4);
+                        done();
+                    });
+                });
+
+                this.transport.close();
+            });
+
+            it('should search within archived files', function (done) {
+                var opts = Object.assign({}, options);
+                opts.zippedArchive = true;
+                opts.maxSize = '1k';
+
+                this.transport = new DailyRotateFile(opts);
+
+                sendLogItem(this.transport, 'info', randomString(1056));
+                sendLogItem(this.transport, 'info', randomString(1056));
+
+                var self = this;
+
+                self.transport.on('archive', function () {
+                    self.transport.query(function (err, results) {
+                        expect(results).to.not.be.null;
+                        expect(results.length).to.equal(2);
+                        done();
+                    });
+                });
             });
         });
     });
