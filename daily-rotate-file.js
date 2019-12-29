@@ -102,6 +102,14 @@ var DailyRotateFile = function (options) {
         });
 
         this.logStream.on('logRemoved', function (params) {
+            if (options.zippedArchive) {
+                var gzName = params.name + '.gz';
+                if (fs.existsSync(gzName)) {
+                    fs.unlinkSync(gzName);
+                    self.emit('logRemoved', gzName);
+                    return;
+                }
+            }
             self.emit('logRemoved', params.name);
         });
 
