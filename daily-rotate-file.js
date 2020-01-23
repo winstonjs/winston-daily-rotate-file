@@ -128,6 +128,7 @@ var DailyRotateFile = function (options) {
                     try {
                         fs.unlinkSync(oldFile);
                     } catch (err) {
+                        // assume already deleted
                     }
                     self.emit('archive', oldFile + '.gz');
                 });
