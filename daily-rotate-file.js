@@ -105,7 +105,16 @@ var DailyRotateFile = function (options) {
             if (options.zippedArchive) {
                 var gzName = params.name + '.gz';
                 if (fs.existsSync(gzName)) {
-                    fs.unlinkSync(gzName);
+                    try {
+                        fs.unlinkSync(gzName);
+                    }
+                    catch (_err) {
+                        // file is there but we got an error when trying to delete,
+                        // so permissions problem or concurrency issue and another
+                        // process already deleted it we could detect the concurrency
+                        // issue by checking err.type === ENOENT or EACCESS for
+                        // permissions ... but then?
+                    }
                     self.emit('logRemoved', gzName);
                     return;
                 }
