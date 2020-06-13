@@ -297,7 +297,9 @@ DailyRotateFile.prototype.query = function (options, callback) {
                 }
 
                 var time = new Date(log.timestamp);
-                if ((options.from && time < options.from) || (options.until && time > options.until)) {
+                if ((options.from && time < options.from) ||
+                    (options.until && time > options.until) ||
+                    (options.level && options.level !== log.level)) {
                     return;
                 }
 
