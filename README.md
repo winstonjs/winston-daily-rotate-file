@@ -39,7 +39,7 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
   var winston = require('winston');
   require('winston-daily-rotate-file');
 
-  var transport = new (winston.transports.DailyRotateFile)({
+  var transport = new winston.transports.DailyRotateFile({
     filename: 'application-%DATE%.log',
     datePattern: 'YYYY-MM-DD-HH',
     zippedArchive: true,
