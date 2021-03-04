@@ -9,7 +9,7 @@ declare module 'winston/lib/winston/transports' {
 }
 
 declare namespace DailyRotateFile {
-    type DailyRotateFileTransportOptions = GeneralDailyRotateFileTransportOptions | (GeneralDailyRotateFileTransportOptions & OptionsWithFilename) | (GeneralDailyRotateFileTransportOptions & OptionsWithStream)
+    type DailyRotateFileTransportOptions = GeneralDailyRotateFileTransportOptions | OptionsWithFilename | OptionsWithStream;
 
     interface OptionsWithFilename extends GeneralDailyRotateFileTransportOptions {
         /**
