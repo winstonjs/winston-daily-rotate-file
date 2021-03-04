@@ -15,7 +15,7 @@ declare namespace DailyRotateFile {
         /**
          * Filename to be used to log to. This filename can include the %DATE% placeholder which will include the formatted datePattern at that point in the filename. (default: 'winston.log.%DATE%)
          */
-        filename?: string;
+        filename: string;
 
         /**
          * Write directly to a custom stream and bypass the rotation capabilities. (default: null)
@@ -32,7 +32,7 @@ declare namespace DailyRotateFile {
         /**
          * Write directly to a custom stream and bypass the rotation capabilities. (default: null)
          */
-        stream?: NodeJS.WritableStream;
+        stream: NodeJS.WritableStream;
     }
 
     interface GeneralDailyRotateFileTransportOptions extends TransportStream.TransportStreamOptions {
