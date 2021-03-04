@@ -12,7 +12,7 @@ declare module 'winston/lib/winston/transports' {
 }
 
 declare namespace DailyRotateFile {
-    type DailyRotateFileTransportOptions = NAND<OptionsWithFilename, OptionsWithStream>;
+    type DailyRotateFileTransportOptions = NAND<GeneralDailyRotateFileTransportOptions, NAND<OptionsWithFilename, OptionsWithStream>>;
 
     interface OptionsWithFilename extends GeneralDailyRotateFileTransportOptions {
         /**
