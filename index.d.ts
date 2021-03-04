@@ -1,7 +1,7 @@
 import TransportStream = require("winston-transport");
 
 type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
-type NAND<T, U> = T | U extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
+type XOR<T, U> = T | U extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
 
 // merging into winston.transports
 declare module 'winston/lib/winston/transports' {
@@ -12,7 +12,7 @@ declare module 'winston/lib/winston/transports' {
 }
 
 declare namespace DailyRotateFile {
-    type DailyRotateFileTransportOptions = NAND<GeneralDailyRotateFileTransportOptions, NAND<OptionsWithFilename, OptionsWithStream>>;
+    type DailyRotateFileTransportOptions = XOR<GeneralDailyRotateFileTransportOptions, XOR<OptionsWithFilename, OptionsWithStream>>;
 
     interface OptionsWithFilename extends GeneralDailyRotateFileTransportOptions {
         /**
