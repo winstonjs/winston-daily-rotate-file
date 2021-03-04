@@ -1,5 +1,8 @@
 import TransportStream = require("winston-transport");
 
+type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+type NAND<T, U> = T | U extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
+
 // merging into winston.transports
 declare module 'winston/lib/winston/transports' {
     interface Transports {
@@ -9,26 +12,16 @@ declare module 'winston/lib/winston/transports' {
 }
 
 declare namespace DailyRotateFile {
-    type DailyRotateFileTransportOptions = GeneralDailyRotateFileTransportOptions | OptionsWithFilename | OptionsWithStream;
+    type DailyRotateFileTransportOptions = NAND<OptionsWithFilename, OptionsWithStream>;
 
     interface OptionsWithFilename extends GeneralDailyRotateFileTransportOptions {
         /**
          * Filename to be used to log to. This filename can include the %DATE% placeholder which will include the formatted datePattern at that point in the filename. (default: 'winston.log.%DATE%)
          */
         filename?: string;
-
-        /**
-         * Write directly to a custom stream and bypass the rotation capabilities. (default: null)
-         */
-        stream?: never;
     }
 
     interface OptionsWithStream extends GeneralDailyRotateFileTransportOptions {
-        /**
-         * Filename to be used to log to. This filename can include the %DATE% placeholder which will include the formatted datePattern at that point in the filename. (default: 'winston.log.%DATE%)
-         */
-        filename?: never;
-
         /**
          * Write directly to a custom stream and bypass the rotation capabilities. (default: null)
          */
