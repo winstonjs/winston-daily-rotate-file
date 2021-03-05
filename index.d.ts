@@ -1,7 +1,13 @@
 import TransportStream = require("winston-transport");
 
-type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
-type XOR<T, U> = T | U extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U;
+// referenced from https://stackoverflow.com/questions/40510611/typescript-interface-require-one-of-two-properties-to-exist
+type RequireOnlyOne<T, Keys extends keyof T = keyof T> =
+    Pick<T, Exclude<keyof T, Keys>>
+    & {
+        [K in Keys]-?:
+            Pick<T, K>
+            & Partial<Record<Exclude<Keys, K>, undefined>>
+    }[Keys];
 
 // merging into winston.transports
 declare module 'winston/lib/winston/transports' {
@@ -12,21 +18,7 @@ declare module 'winston/lib/winston/transports' {
 }
 
 declare namespace DailyRotateFile {
-    type DailyRotateFileTransportOptions = XOR<GeneralDailyRotateFileTransportOptions, XOR<OptionsWithFilename, OptionsWithStream>>;
-
-    interface OptionsWithFilename extends GeneralDailyRotateFileTransportOptions {
-        /**
-         * Filename to be used to log to. This filename can include the %DATE% placeholder which will include the formatted datePattern at that point in the filename. (default: 'winston.log.%DATE%)
-         */
-        filename?: string;
-    }
-
-    interface OptionsWithStream extends GeneralDailyRotateFileTransportOptions {
-        /**
-         * Write directly to a custom stream and bypass the rotation capabilities. (default: null)
-         */
-        stream?: NodeJS.WritableStream;
-    }
+    type DailyRotateFileTransportOptions = RequireOnlyOne<GeneralDailyRotateFileTransportOptions, 'filename' | 'stream'>;
 
     interface GeneralDailyRotateFileTransportOptions extends TransportStream.TransportStreamOptions {
         json?: boolean;
@@ -43,9 +35,19 @@ declare namespace DailyRotateFile {
         zippedArchive?: boolean;
 
         /**
+         * Filename to be used to log to. This filename can include the %DATE% placeholder which will include the formatted datePattern at that point in the filename. (default: 'winston.log.%DATE%)
+         */
+        filename?: string;
+
+        /**
          * The directory name to save log files to. (default: '.')
          */
         dirname?: string;
+
+        /**
+         * Write directly to a custom stream and bypass the rotation capabilities. (default: null)
+         */
+        stream?: NodeJS.WritableStream;
 
         /**
          * Maximum size of the file after which it will rotate. This can be a number of bytes, or units of kb, mb, and gb. If using the units, add 'k', 'm', or 'g' as the suffix. The units need to directly follow the number. (default: null)
