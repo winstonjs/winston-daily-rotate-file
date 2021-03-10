@@ -22,7 +22,7 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
 * **frequency:** A string representing the frequency of rotation. This is useful if you want to have timed rotations, as opposed to rotations that happen at specific moments in time. Valid values are '#m' or '#h' (e.g., '5m' or '3h'). Leaving this null relies on `datePattern` for the rotation times. (default: null)
 * **datePattern:** A string representing the [moment.js date format](http://momentjs.com/docs/#/displaying/format/) to be used for rotating. The meta characters used in this string will dictate the frequency of the file rotation. For example, if your datePattern is simply 'HH' you will end up with 24 log files that are picked up and appended to every day. (default: 'YYYY-MM-DD')
 * **zippedArchive:** A boolean to define whether or not to gzip archived log files. (default: 'false')
-* **filename:** Filename to be used to log to. This filename can include the `%DATE%` placeholder which will include the formatted datePattern at that point in the filename. (default: 'winston.log.%DATE%)
+* **filename:** Filename to be used to log to. This filename can include the `%DATE%` placeholder which will include the formatted datePattern at that point in the filename. (default: 'winston.log.%DATE%')
 * **dirname:** The directory name to save log files to. (default: '.')
 * **stream:** Write directly to a custom stream and bypass the rotation capabilities. (default: null)
 * **maxSize:** Maximum size of the file after which it will rotate. This can be a number of bytes, or units of kb, mb, and gb. If using the units, add 'k', 'm', or 'g' as the suffix. The units need to directly follow the number. (default: null)
