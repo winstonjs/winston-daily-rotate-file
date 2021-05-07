@@ -93,6 +93,8 @@ declare namespace DailyRotateFile {
          * The name of the tailable symlink. (default: 'current.log')
          */
         symlinkName?: string;
+
+        handleRejections?: boolean;
     }
 }
 
