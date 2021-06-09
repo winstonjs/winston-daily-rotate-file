@@ -35,7 +35,7 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
 * **symlinkName**: The name of the tailable symlink. (default: 'current.log')
 
 ## Usage
-``` js
+``` js 
   var winston = require('winston');
   require('winston-daily-rotate-file');
 
@@ -58,7 +58,65 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
   });
 
   logger.info('Hello World!');
+
 ```
+
+### ES6
+
+``` js
+import  *  as  winston  from  'winston';
+import  'winston-daily-rotate-file';
+
+
+const transport = new winston.transports.DailyRotateFile({
+  filename: 'application-%DATE%.log',
+  datePattern: 'YYYY-MM-DD-HH',
+  zippedArchive: true,
+  maxSize: '20m',
+  maxFiles: '14d'
+});
+
+transport.on('rotate', function(oldFilename, newFilename) {
+  // do something fun
+});
+
+const logger = winston.createLogger({
+  transports: [
+    transport
+  ]
+});
+
+logger.info('Hello World!');
+```
+
+### Typescript
+
+``` typescript
+   
+import  *  as  winston  from  'winston';
+import  DailyRotateFile from 'winston-daily-rotate-file';
+
+const transport: DailyRotateFile = new DailyRotateFile({
+    filename: 'application-%DATE%.log',
+    datePattern: 'YYYY-MM-DD-HH',
+    zippedArchive: true,
+    maxSize: '20m',
+    maxFiles: '14d'
+  });
+
+transport.on('rotate', function(oldFilename, newFilename) {
+      // do something fun
+    });
+  
+const logger = winston.createLogger({
+transports: [
+  transport
+]});
+  
+logger.info('Hello World!');
+
+```
+
 
 This transport emits the following custom events:
 
