@@ -196,6 +196,26 @@ describe('winston/transports/daily-rotate-file', function () {
             });
         });
 
+        describe('when setting watchLog', function () {
+            it('should addWatcher to recreate log if deleted', function (done) {
+                var opts = Object.assign({}, options);
+                opts.watchLog = true;
+                this.transport = new DailyRotateFile(opts);
+
+                this.transport.on('addWatcher', (newFile) => { 
+                    expect(newFile).to.equal(filename);
+                    done()
+                });
+
+                this.transport.on('new', (newFile) => {
+                    expect(newFile).to.equal(filename);
+                });
+
+                sendLogItem(this.transport, 'info', 'First message to file');
+                this.transport.close();
+            });
+        });
+        
         describe('query', function () {
             it('should call callback when no files are present', function () {
                 this.transport.query(function (err, results) {

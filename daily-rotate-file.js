@@ -142,6 +142,12 @@ var DailyRotateFile = function (options) {
                 });
             });
         }
+
+        if (options.watchLog) {
+            this.logStream.on('addWatcher', (newFile) => {
+                self.emit('addWatcher', newFile);
+            })
+        }
     }
 };
 
