@@ -90,7 +90,8 @@ var DailyRotateFile = function (options) {
             utc: options.utc ? options.utc : false,
             extension: options.extension ? options.extension : '',
             create_symlink: options.createSymlink ? options.createSymlink : false,
-            symlink_name: options.symlinkName ? options.symlinkName : 'current.log'
+            symlink_name: options.symlinkName ? options.symlinkName : 'current.log',
+            watch_log: options.watchLog ? options.watchLog : false
         });
 
         this.logStream.on('new', function (newFile) {
