@@ -35,7 +35,7 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
 * **symlinkName**: The name of the tailable symlink. (default: 'current.log')
 
 ## Usage
-``` js 
+``` js
   var winston = require('winston');
   require('winston-daily-rotate-file');
 
