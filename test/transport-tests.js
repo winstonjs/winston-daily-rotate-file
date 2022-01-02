@@ -68,29 +68,6 @@ describe('winston/transports/daily-rotate-file', function () {
         });
     });
 
-    describe('when passed metadata', function () {
-        var circular = {};
-        circular.metadata = circular;
-
-        var params = {
-            no: {},
-            object: {metadata: true},
-            primitive: 'metadata',
-            circular: circular
-        };
-
-        Object.keys(params).forEach(function (param) {
-            it('should accept log messages with ' + param + ' metadata', function (done) {
-                sendLogItem(this.transport, 'info', 'test log message', params[param], function (err, logged) {
-                    expect(err).to.be.null;
-                    expect(logged).to.be.true;
-                    // TODO parse the metadata value to make sure its set properly
-                    done();
-                });
-            });
-        });
-    });
-
     describe('when using a filename or dirname', function () {
         var logDir = path.join(__dirname, 'logs');
         var now = moment().utc().format('YYYY-MM-DD-HH');
