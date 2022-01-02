@@ -12,27 +12,20 @@ var randomString = require('./random-string');
 var DailyRotateFile = require('../daily-rotate-file');
 
 function sendLogItem(transport, level, message, meta, cb) { // eslint-disable-line max-params
-    var logger = winston.createLogger({
-        transports: [transport]
-    });
-
     transport.on('logged', function () {
         if (cb) {
             cb(null, true);
         }
     });
 
-    logger.info({
-        level: level,
-        message: message
-    });
+    const info = { level: level, message: message };
+    transport.log(winston.format.json().transform(info));
 }
 
 describe('winston/transports/daily-rotate-file', function () {
     beforeEach(function () {
         this.stream = new MemoryStream();
         this.transport = new DailyRotateFile({
-            json: true,
             stream: this.stream
         });
     });
