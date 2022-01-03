@@ -1,6 +1,6 @@
 # winston-daily-rotate-file
 
-[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+[![NPM version][npm-image]][npm-url]
 
 [![NPM](https://nodei.co/npm/winston-daily-rotate-file.png)](https://nodei.co/npm/winston-daily-rotate-file/)
 
@@ -133,7 +133,3 @@ MIT
 
 [npm-image]: https://badge.fury.io/js/winston-daily-rotate-file.svg
 [npm-url]: https://npmjs.org/package/winston-daily-rotate-file
-[travis-image]: https://travis-ci.org/winstonjs/winston-daily-rotate-file.svg?branch=master
-[travis-url]: https://travis-ci.org/winstonjs/winston-daily-rotate-file
-[daviddm-image]: https://david-dm.org/winstonjs/winston-daily-rotate-file.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/winstonjs/winston-daily-rotate-file
