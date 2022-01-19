@@ -7,8 +7,8 @@ var expect = require('chai').expect;
 var rimraf = require('rimraf');
 var moment = require('moment');
 var winston = require('winston');
-var { spawn, Thread, Worker } = require('threads')
-var { promisify } = require('util')
+var { spawn, Thread, Worker } = require('threads');
+var { promisify } = require('util');
 var MemoryStream = require('./memory-stream');
 var randomString = require('./random-string');
 var DailyRotateFile = require('../daily-rotate-file');
@@ -235,15 +235,15 @@ describe('winston/transports/daily-rotate-file', function () {
         describe('concurrent', () => {
             it('should not throw EEXIST', async () => {
                 const logDir = path.join(__dirname, 'concurrent-logs');
-                await promisify(rimraf)(logDir)
+                await promisify(rimraf)(logDir);
                 const workers = await Promise.all([
                     spawn(new Worker('./transport.worker.js')),
                     spawn(new Worker('./transport.worker.js')),
                     spawn(new Worker('./transport.worker.js')),
                 ]);
-            await Promise.all(workers.map(worker => worker.run()))
-            await Promise.all(workers.map(worker => Thread.terminate(worker)))
-          })
+                await Promise.all(workers.map(worker => worker.run()));
+                await Promise.all(workers.map(worker => Thread.terminate(worker)));
+            })
         })
     });
 });

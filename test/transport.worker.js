@@ -1,4 +1,4 @@
-const path = require('path')
+const path = require('path');
 // eslint-disable-next-line node/no-unpublished-require -- It's published, see: https://threads.js.org/
 const { expose } = require("threads/worker");
 const DailyRotateFile = require("../daily-rotate-file");
