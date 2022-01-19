@@ -7,6 +7,7 @@ var expect = require('chai').expect;
 var rimraf = require('rimraf');
 var moment = require('moment');
 var winston = require('winston');
+// eslint-disable-next-line node/no-unpublished-require -- It's published, see: https://threads.js.org/
 var { spawn, Thread, Worker } = require('threads');
 var { promisify } = require('util');
 var MemoryStream = require('./memory-stream');
