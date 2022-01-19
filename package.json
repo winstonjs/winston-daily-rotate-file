@@ -8,7 +8,7 @@
     "node": ">=12"
   },
   "scripts": {
-    "test": "mocha && eslint .",
+    "test": "mocha --ignore **/*.worker.js && eslint .",
     "preversion": "npm test",
     "postversion": "git push && git push --tags && npm publish"
   },
@@ -35,9 +35,12 @@
     "chai": "4.2.0",
     "eslint": "^8.5.0",
     "eslint-plugin-node": "^11.1.0",
+    "jest": "^27.4.7",
     "mocha": "^9.1.3",
     "moment": "^2.29.1",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "threads": "^1.7.0",
+    "winston": "^3.4.0"
   },
   "dependencies": {
     "file-stream-rotator": "^0.5.7",
