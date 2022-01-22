@@ -77,10 +77,6 @@ var DailyRotateFile = function (options) {
 
         var self = this;
 
-        // fix race condition in `file-stream-rotator`
-        // see: https://github.com/rogerc/file-stream-rotator/pull/81
-        fs.mkdirSync(this.dirname, { recursive: true })
-
         this.logStream = require('file-stream-rotator').getStream({
             filename: path.join(this.dirname, this.filename),
             frequency: options.frequency ? options.frequency : 'custom',
