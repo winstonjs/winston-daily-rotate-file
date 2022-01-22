@@ -94,6 +94,11 @@ declare namespace DailyRotateFile {
          */
         symlinkName?: string;
 
+        /**
+         * Watch the current file being written to and recreate it in case of accidental deletion. (default: FALSE)
+         */
+        watchLog?: boolean;
+        
         handleRejections?: boolean;
     }
 }

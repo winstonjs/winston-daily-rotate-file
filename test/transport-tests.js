@@ -93,7 +93,7 @@ describe('winston/transports/daily-rotate-file', function () {
         });
 
         it('should write to the file', function (done) {
-            this.transport.on('finish', function () {
+            const finishListener = () => {
                 var logEntries = fs.readFileSync(filename).toString().split('\n').slice(0, -1);
                 expect(logEntries.length).to.equal(1);
 
@@ -101,7 +101,11 @@ describe('winston/transports/daily-rotate-file', function () {
                 expect(logEntry.level).to.equal('info');
                 expect(logEntry.message).to.equal('this message should write to the file');
                 done();
-            });
+
+                this.transport.removeListener('finish', finishListener)
+            }
+
+            this.transport.on('finish', finishListener);
 
             sendLogItem(this.transport, 'info', 'this message should write to the file', {}, function (err, logged) {
                 expect(err).to.be.null;
@@ -155,16 +159,40 @@ describe('winston/transports/daily-rotate-file', function () {
 
                 this.transport = new DailyRotateFile(opts);
 
-                this.transport.on('finish', function () {
+                const finishListener = () => {
                     fs.readdir(logDir, function (err, files) {
                         expect(files.filter(function (file) {
                             return path.extname(file) === '.gz';
                         }).length).to.equal(1);
                         done();
                     });
+
+                    this.transport.removeListener('finish', finishListener)
+                }
+
+                this.transport.on('finish', finishListener);
+                sendLogItem(this.transport, 'info', randomString(1056));
+                sendLogItem(this.transport, 'info', randomString(1056));
+                this.transport.close();
+            });
+        });
+
+        describe('when setting watchLog', function () {
+            it('should addWatcher to recreate log if deleted', function (done) {
+                var opts = Object.assign({}, options);
+                opts.watchLog = true;
+                this.transport = new DailyRotateFile(opts);
+
+                this.transport.on('addWatcher', (newFile) => { 
+                    expect(newFile).to.equal(filename);
+                    done()
                 });
-                sendLogItem(this.transport, 'info', randomString(1056));
-                sendLogItem(this.transport, 'info', randomString(1056));
+
+                this.transport.on('new', (newFile) => {
+                    expect(newFile).to.equal(filename);
+                });
+
+                sendLogItem(this.transport, 'info', 'First message to file');
                 this.transport.close();
             });
         });
@@ -200,13 +228,16 @@ describe('winston/transports/daily-rotate-file', function () {
                 sendLogItem(this.transport, 'info', randomString(1056));
 
                 var self = this;
-                this.transport.on('finish', function () {
+                const finishListener = () => {
                     self.transport.query(function (err, results) {
                         expect(results).to.not.be.null;
                         expect(results.length).to.equal(4);
                         done();
                     });
-                });
+                    this.transport.removeListener('finish', finishListener)
+                }
+                
+                this.transport.on('finish', finishListener);
 
                 this.transport.close();
             });
