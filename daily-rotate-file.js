@@ -61,6 +61,24 @@ var DailyRotateFile = function (options) {
         return !/["<>|\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f]/g.test(dirname);
     }
 
+    function archive(oldFile) {
+        var oldFileExist = fs.existsSync(oldFile);
+        var gzExist = fs.existsSync(oldFile + '.gz');
+        if (!oldFileExist || gzExist) {
+            return;
+        }
+
+        var gzip = zlib.createGzip();
+        var inp = fs.createReadStream(oldFile);
+        var out = fs.createWriteStream(oldFile + '.gz');
+        inp.pipe(gzip).pipe(out).on('finish', function () {
+            if (fs.existsSync(oldFile)) {
+                fs.unlinkSync(oldFile);
+            }
+            self.emit('archive', oldFile + '.gz');
+        });
+    }
+
     this.options = Object.assign({}, loggerDefaults, options);
 
     if (options.stream) {
@@ -124,22 +142,19 @@ var DailyRotateFile = function (options) {
         });
 
         if (options.zippedArchive) {
-            this.logStream.on('rotate', function (oldFile) {
-                var oldFileExist = fs.existsSync(oldFile);
-                var gzExist = fs.existsSync(oldFile + '.gz');
-                if (!oldFileExist || gzExist) {
-                    return;
+            this.logStream.on('new', function () {
+                if (self.logStream.auditLog
+                    && self.logStream.auditLog.files
+                    && self.logStream.auditLog.files.length > 1
+                    && self.logStream.auditLog.files[self.logStream.auditLog.files.length - 2]
+                ) {
+                    var lastOldFileAfterRestart = self.logStream.auditLog.files[self.logStream.auditLog.files.length - 2].name;
+                    archive(lastOldFileAfterRestart);
                 }
+            });
 
-                var gzip = zlib.createGzip();
-                var inp = fs.createReadStream(oldFile);
-                var out = fs.createWriteStream(oldFile + '.gz');
-                inp.pipe(gzip).pipe(out).on('finish', function () {
-                    if (fs.existsSync(oldFile)) {
-                        fs.unlinkSync(oldFile);
-                    }
-                    self.emit('archive', oldFile + '.gz');
-                });
+            this.logStream.on('rotate', function (oldFile) {
+                archive(oldFile);
             });
         }
 
