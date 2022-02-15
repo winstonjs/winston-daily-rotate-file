@@ -5,7 +5,7 @@
   "main": "index.js",
   "types": "index.d.ts",
   "engines": {
-    "node": ">=12"
+    "node": ">=8"
   },
   "scripts": {
     "test": "mocha --ignore **/*.worker.js && eslint .",
@@ -27,15 +27,20 @@
   "bugs": {
     "url": "https://github.com/winstonjs/winston-daily-rotate-file/issues"
   },
+  "files": [
+    "daily-rotate-file.js",
+    "index.js",
+    "index.d.ts"
+  ],
   "homepage": "https://github.com/winstonjs/winston-daily-rotate-file#readme",
   "peerDependencies": {
     "winston": "^3"
   },
   "devDependencies": {
     "chai": "4.2.0",
-    "eslint": "^8.5.0",
+    "eslint": "^6.8.0",
     "eslint-plugin-node": "^11.1.0",
-    "mocha": "^9.1.3",
+    "mocha": "^7.2.0",
     "moment": "^2.29.1",
     "rimraf": "^3.0.2",
     "threads": "^1.7.0"
