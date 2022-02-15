@@ -7,7 +7,7 @@ var expect = require('chai').expect;
 var rimraf = require('rimraf');
 var moment = require('moment');
 var winston = require('winston');
-// eslint-disable-next-line node/no-unpublished-require -- It's published, see: https://threads.js.org/
+// eslint-disable-next-line node/no-unpublished-require
 var { spawn, Thread, Worker } = require('threads');
 var { promisify } = require('util');
 var MemoryStream = require('./memory-stream');
@@ -22,7 +22,8 @@ function sendLogItem(transport, level, message, meta, cb) { // eslint-disable-li
     });
 
     const info = { level: level, message: message };
-    transport.log(winston.format.json().transform(info));
+    const jsonFormat = winston.format.json();
+    transport.log(jsonFormat.transform(info, jsonFormat.options));
 }
 
 describe('winston/transports/daily-rotate-file', function () {
@@ -183,7 +184,7 @@ describe('winston/transports/daily-rotate-file', function () {
                 opts.watchLog = true;
                 this.transport = new DailyRotateFile(opts);
 
-                this.transport.on('addWatcher', (newFile) => { 
+                this.transport.on('addWatcher', (newFile) => {
                     expect(newFile).to.equal(filename);
                     done()
                 });
@@ -236,7 +237,7 @@ describe('winston/transports/daily-rotate-file', function () {
                     });
                     this.transport.removeListener('finish', finishListener)
                 }
-                
+
                 this.transport.on('finish', finishListener);
 
                 this.transport.close();
