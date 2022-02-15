@@ -8,9 +8,7 @@
     "node": ">=8"
   },
   "scripts": {
-    "test": "mocha --ignore **/*.worker.js && eslint .",
-    "preversion": "npm test",
-    "postversion": "git push && git push --tags && npm publish"
+    "test": "mocha --ignore **/*.worker.js && eslint ."
   },
   "repository": {
     "type": "git",
