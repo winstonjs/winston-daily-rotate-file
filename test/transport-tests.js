@@ -5,7 +5,6 @@ var fs = require('fs');
 var path = require('path');
 var expect = require('chai').expect;
 var rimraf = require('rimraf');
-var moment = require('moment');
 var winston = require('winston');
 // eslint-disable-next-line node/no-unpublished-require
 var { spawn, Thread, Worker } = require('threads');
@@ -74,7 +73,7 @@ describe('winston/transports/daily-rotate-file', function () {
 
     describe('when using a filename or dirname', function () {
         var logDir = path.join(__dirname, 'logs');
-        var now = moment().utc().format('YYYY-MM-DD-HH');
+        var now = new Date().toISOString().replace('T', '-').slice(0, 13); // YYYY-MM-DD-HH
         var filename = path.join(logDir, 'application-' + now + '.testlog');
         var options = {
             json: true,
