@@ -13,7 +13,7 @@
             "properties": "never"
         }],
         "node/no-unpublished-require": ["error", {
-            "allowModules": ["chai", "rimraf", "moment"]
+            "allowModules": ["chai", "rimraf"]
         }]
     }
 }
