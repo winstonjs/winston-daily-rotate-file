@@ -91,7 +91,8 @@ var DailyRotateFile = function (options) {
             extension: options.extension ? options.extension : '',
             create_symlink: options.createSymlink ? options.createSymlink : false,
             symlink_name: options.symlinkName ? options.symlinkName : 'current.log',
-            watch_log: options.watchLog ? options.watchLog : false
+            watch_log: options.watchLog ? options.watchLog : false,
+            audit_hash_type: options.auditHashType ? options.auditHashType  : 'sha256'
         });
 
         this.logStream.on('new', function (newFile) {
