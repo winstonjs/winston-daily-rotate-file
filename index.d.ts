@@ -100,6 +100,11 @@ declare namespace DailyRotateFile {
         watchLog?: boolean;
         
         handleRejections?: boolean;
+
+        /**
+         * Use specified hashing algorithm for audit. (default: 'sha256')
+         */
+        auditHashType?: string;
     }
 }
 

@@ -33,6 +33,7 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
 * **extension**: File extension to be appended to the filename. (default: '')
 * **createSymlink**: Create a tailable symlink to the current active log file. (default: false)
 * **symlinkName**: The name of the tailable symlink. (default: 'current.log')
+* **auditHashType**: Use specified hashing algorithm for audit. (default: 'sha256')
 
 ## Usage
 ``` js
