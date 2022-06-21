@@ -34,6 +34,7 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
 * **createSymlink**: Create a tailable symlink to the current active log file. (default: false)
 * **symlinkName**: The name of the tailable symlink. (default: 'current.log')
 * **auditHashType**: Use specified hashing algorithm for audit. (default: 'sha256')
+* **level**: Name of the logging level that will be used for the transport, if not specified option from `createLogger` method will be used
 
 ## Usage
 ``` js
@@ -41,6 +42,7 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
   require('winston-daily-rotate-file');
 
   var transport = new winston.transports.DailyRotateFile({
+    level: 'info',
     filename: 'application-%DATE%.log',
     datePattern: 'YYYY-MM-DD-HH',
     zippedArchive: true,
@@ -59,6 +61,44 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
   });
 
   logger.info('Hello World!');
+
+```
+using multiple transports
+``` js
+  var winston = require('winston');
+  require('winston-daily-rotate-file');
+
+  var transport1 = new winston.transports.DailyRotateFile({
+    filename: 'application-%DATE%.log',
+    datePattern: 'YYYY-MM-DD-HH',
+    zippedArchive: true,
+    maxSize: '20m',
+    maxFiles: '14d'
+  });
+
+  var transport2 = new winston.transports.DailyRotateFile({
+    level: 'error',
+    filename: 'application-error-%DATE%.log',
+    datePattern: 'YYYY-MM-DD-HH',
+    zippedArchive: true,
+    maxSize: '20m',
+    maxFiles: '14d'
+  });
+
+  transport.on('rotate', function(oldFilename, newFilename) {
+    // do something fun
+  });
+
+  var logger = winston.createLogger({
+    level: 'info'
+    transports: [
+      transport1, // will be used on info level
+      transport2  // will be used on error level
+    ]
+  });
+
+  logger.info('Hello World!');
+  logger.error('Hello Error!');
 
 ```
 
