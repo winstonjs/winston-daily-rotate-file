@@ -65,7 +65,7 @@ declare namespace DailyRotateFile {
         options?: string | object;
 
         /**
-         * A string representing the name of the name of the audit file. (default: './hash-audit.json')
+         * A string representing the name of the audit file. (default: './hash-audit.json')
          */
         auditFile?: string;
 
