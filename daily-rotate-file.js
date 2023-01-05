@@ -136,8 +136,12 @@ var DailyRotateFile = function (options) {
                 var inp = fs.createReadStream(oldFile);
                 var out = fs.createWriteStream(oldFile + '.gz');
                 inp.pipe(gzip).pipe(out).on('finish', function () {
-                    if (fs.existsSync(oldFile)) {
-                        fs.unlinkSync(oldFile);
+                    try {
+                        if (fs.existsSync(oldFile)) {
+                            fs.unlinkSync(oldFile);
+                        }
+                    } catch (err) {
+                        // ignore becauuse should only happen in bad timing cases
                     }
                     self.emit('archive', oldFile + '.gz');
                 });
