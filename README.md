@@ -6,7 +6,7 @@
 
 A transport for [winston](https://github.com/winstonjs/winston) which logs to a rotating file. Logs can be rotated based on a date, size limit, and old logs can be removed based on count or elapsed days.
 
-Starting with version 2.0.0, the transport has been refactored to leverage the the [file-stream-rotator](https://github.com/rogerc/file-stream-rotator/) module. _Some of the options in the 1.x versions of the transport have changed._ Please review the options below to identify any changes needed.
+Starting with version 2.0.0, the transport has been refactored to leverage the [file-stream-rotator](https://github.com/rogerc/file-stream-rotator/) module. _Some of the options in the 1.x versions of the transport have changed._ Please review the options below to identify any changes needed.
 
 ## Compatibility
 Please note that if you are using `winston@2`, you will need to use `winston-daily-rotate-file@3`. `winston-daily-rotate-file@4` removed support for `winston@2`.
