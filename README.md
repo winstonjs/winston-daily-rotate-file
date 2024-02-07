@@ -13,6 +13,8 @@ Please note that if you are using `winston@2`, you will need to use `winston-dai
 
 Starting with version 5.0.0 this module also emits an "error" event for all low level filesystem error cases. Make sure to listen for this event to prevent crashes in your application.
 
+This library should work starting with Node.js 8.x, but tests are only executed for Node.js 14+. Use on your own risk in lower Node.js versions.
+
 ## Install
 ```
 npm install winston-daily-rotate-file
