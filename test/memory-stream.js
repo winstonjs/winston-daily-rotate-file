@@ -1,7 +1,5 @@
-'use strict';
-
-var Stream = require('stream');
-var util = require('util');
+const Stream = require("stream");
+const util = require("util");
 
 module.exports = WritableStream;
 
@@ -12,7 +10,7 @@ function WritableStream(options) {
 }
 
 WritableStream.prototype.write = function () {
-    var ret = Stream.Writable.prototype.write.apply(this, arguments);
+    const ret = Stream.Writable.prototype.write.apply(this, arguments);
     if (!ret) {
         this.emit('drain');
     }
@@ -30,7 +28,7 @@ WritableStream.prototype.toString = function () {
 
 WritableStream.prototype.toBuffer = function () {
     var buffers = [];
-    this._writableState.getBuffer().forEach(function (data) {
+    this._writableState.getBuffer().forEach((data) => {
         buffers.push(data.chunk);
     });
 

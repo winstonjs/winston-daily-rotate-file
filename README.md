@@ -11,6 +11,10 @@ Starting with version 2.0.0, the transport has been refactored to leverage the [
 ## Compatibility
 Please note that if you are using `winston@2`, you will need to use `winston-daily-rotate-file@3`. `winston-daily-rotate-file@4` removed support for `winston@2`.
 
+Starting with version 5.0.0 this module also emits an "error" event for all low level filesystem error cases. Make sure to listen for this event to prevent crashes in your application.
+
+This library should work starting with Node.js 8.x, but tests are only executed for Node.js 14+. Use on your own risk in lower Node.js versions.
+
 ## Install
 ```
 npm install winston-daily-rotate-file
@@ -49,8 +53,12 @@ The DailyRotateFile transport can rotate files by minute, hour, day, month, year
     maxSize: '20m',
     maxFiles: '14d'
   });
+  
+  transport.on('error', error => {
+    // log or handle errors here
+  });
 
-  transport.on('rotate', function(oldFilename, newFilename) {
+  transport.on('rotate', (oldFilename, newFilename) => {
     // do something fun
   });
 
@@ -85,7 +93,19 @@ using multiple transports
     maxFiles: '14d'
   });
 
-  transport.on('rotate', function(oldFilename, newFilename) {
+  transport1.on('error', error => {
+    // log or handle errors here
+  });
+
+  transport2.on('error', error => {
+    // log or handle errors here
+  });
+
+  transport1.on('rotate', function(oldFilename, newFilename) {
+    // do something fun
+  });
+
+  transport2.on('rotate', function(oldFilename, newFilename) {
     // do something fun
   });
 
@@ -117,7 +137,11 @@ const transport = new winston.transports.DailyRotateFile({
   maxFiles: '14d'
 });
 
-transport.on('rotate', function(oldFilename, newFilename) {
+transport.on('error', error => {
+  // log or handle errors here
+});
+
+transport.on('rotate', (oldFilename, newFilename) => {
   // do something fun
 });
 
@@ -134,8 +158,8 @@ logger.info('Hello World!');
 
 ``` typescript
 
-import  *  as  winston  from  'winston';
-import  DailyRotateFile from 'winston-daily-rotate-file';
+import * as winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 const transport: DailyRotateFile = new DailyRotateFile({
     filename: 'application-%DATE%.log',
@@ -143,19 +167,24 @@ const transport: DailyRotateFile = new DailyRotateFile({
     zippedArchive: true,
     maxSize: '20m',
     maxFiles: '14d'
-  });
+});
 
-transport.on('rotate', function(oldFilename, newFilename) {
-      // do something fun
-    });
+transport.on('error', error => {
+    // log or handle errors here
+});
+
+
+transport.on('rotate', (oldFilename, newFilename) => {
+    // do something fun
+});
 
 const logger = winston.createLogger({
-transports: [
-  transport
-]});
+    transports: [
+        transport
+    ]
+});
 
 logger.info('Hello World!');
-
 ```
 
 
@@ -165,6 +194,7 @@ This transport emits the following custom events:
 * **rotate**: fired when the log file is rotated. This event will pass two parameters to the callback (*oldFilename*, *newFilename*).
 * **archive**: fired when the log file is archived. This event will pass one parameter to the callback (*zipFilename*).
 * **logRemoved**: fired when a log file is removed from the file system. This event will pass one parameter to the callback (*removedFilename*).
+* * **error**: fired when a low level filesystem error happens (e.g. EACCESS)
 
 ## LICENSE
 MIT

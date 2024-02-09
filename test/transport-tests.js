@@ -1,17 +1,14 @@
 /* eslint-disable max-nested-callbacks,no-unused-expressions,handle-callback-err */
-'use strict';
-
-var fs = require('fs');
-var path = require('path');
-var expect = require('chai').expect;
-var rimraf = require('rimraf');
-var winston = require('winston');
+const fs = require("fs");
+const path = require("path");
+const expect = require("chai").expect;
+const { rimrafSync, rimraf } = require("rimraf");
+const winston = require("winston");
 // eslint-disable-next-line node/no-unpublished-require
-var { spawn, Thread, Worker } = require('threads');
-var { promisify } = require('util');
-var MemoryStream = require('./memory-stream');
-var randomString = require('./random-string');
-var DailyRotateFile = require('../daily-rotate-file');
+const { spawn, Thread, Worker } = require("threads");
+const MemoryStream = require("./memory-stream");
+const randomString = require("./random-string");
+const DailyRotateFile = require("../daily-rotate-file");
 
 function sendLogItem(transport, level, message, meta, cb) { // eslint-disable-line max-params
     transport.on('logged', function () {
@@ -26,22 +23,25 @@ function sendLogItem(transport, level, message, meta, cb) { // eslint-disable-li
 }
 
 describe('winston/transports/daily-rotate-file', function () {
-    beforeEach(function () {
+    beforeEach( () => {
         this.stream = new MemoryStream();
         this.transport = new DailyRotateFile({
             stream: this.stream
         });
+        this.transport.on("error", function (err) {
+            expect(err).to.be.null; // never true for errors, so will cause test to fail
+        });
     });
 
-    it('should have the proper methods defined', function () {
-        var transport = new DailyRotateFile({stream: new MemoryStream()});
+    it('should have the proper methods defined', () => {
+        const transport = new DailyRotateFile({ stream: new MemoryStream() });
         expect(transport).to.be.instanceOf(DailyRotateFile);
         expect(transport).to.respondTo('log');
         expect(transport).to.respondTo('query');
     });
 
-    it('should not allow invalid characters in the filename', function () {
-        expect(function () {
+    it('should not allow invalid characters in the filename', () => {
+        expect( () => {
             // eslint-disable-next-line no-new
             new DailyRotateFile({
                 filename: 'test\0log.log'
@@ -49,8 +49,8 @@ describe('winston/transports/daily-rotate-file', function () {
         }).to.throw();
     });
 
-    it('should not allow invalid characters in the dirname', function () {
-        expect(function () {
+    it('should not allow invalid characters in the dirname', () => {
+        expect( () => {
             // eslint-disable-next-line no-new
             new DailyRotateFile({
                 dirname: 'C:\\application<logs>',
@@ -59,55 +59,50 @@ describe('winston/transports/daily-rotate-file', function () {
         }).to.throw();
     });
 
-    it('should write to the stream', function (done) {
-        var self = this;
-        sendLogItem(this.transport, 'info', 'this message should write to the stream', {}, function (err, logged) {
+    it('should write to the stream', (done) => {
+        sendLogItem(this.transport, 'info', 'this message should write to the stream', {}, (err, logged) => {
             expect(err).to.be.null;
             expect(logged).to.be.true;
-            var logEntry = JSON.parse(self.stream.toString());
+            const logEntry = JSON.parse(this.stream.toString());
             expect(logEntry.level).to.equal('info');
             expect(logEntry.message).to.equal('this message should write to the stream');
             done();
         });
     });
 
-    describe('when using a filename or dirname', function () {
-        var logDir = path.join(__dirname, 'logs');
-        var now = new Date().toISOString().replace('T', '-').slice(0, 13); // YYYY-MM-DD-HH
-        var filename = path.join(logDir, 'application-' + now + '.testlog');
-        var options = {
+    describe('when using a filename or dirname', () => {
+        const logDir = path.join(__dirname, "logs");
+        const now = new Date().toISOString().replace("T", "-").slice(0, 13); // YYYY-MM-DD-HH
+        const filename = path.join(logDir, "application-" + now + ".testlog");
+        const options = {
             json: true,
             dirname: logDir,
-            filename: 'application-%DATE%',
-            datePattern: 'YYYY-MM-DD-HH',
+            filename: "application-%DATE%",
+            datePattern: "YYYY-MM-DD-HH",
             utc: true,
-            extension: '.testlog'
+            extension: ".testlog"
         };
 
-        beforeEach(function (done) {
-            var self = this;
-            rimraf(logDir, function () {
-                self.transport = new DailyRotateFile(options);
-                done();
-            });
+        beforeEach(() => {
+            expect(rimrafSync(logDir)).true;
+            this.transport = new DailyRotateFile(options);
         });
 
-        it('should write to the file', function (done) {
+        it('should write to the file', (done) => {
             const finishListener = () => {
-                var logEntries = fs.readFileSync(filename).toString().split('\n').slice(0, -1);
+                const logEntries = fs.readFileSync(filename).toString().split("\n").slice(0, -1);
                 expect(logEntries.length).to.equal(1);
 
-                var logEntry = JSON.parse(logEntries[0]);
+                const logEntry = JSON.parse(logEntries[0]);
                 expect(logEntry.level).to.equal('info');
                 expect(logEntry.message).to.equal('this message should write to the file');
-                done();
-
                 this.transport.removeListener('finish', finishListener)
+                done();
             }
 
             this.transport.on('finish', finishListener);
 
-            sendLogItem(this.transport, 'info', 'this message should write to the file', {}, function (err, logged) {
+            sendLogItem(this.transport, 'info', 'this message should write to the file', {},  (err, logged) => {
                 expect(err).to.be.null;
                 expect(logged).to.be.true;
             });
@@ -115,17 +110,17 @@ describe('winston/transports/daily-rotate-file', function () {
             this.transport.close();
         });
 
-        it('should not allow the stream to be set', function () {
-            var opts = Object.assign({}, options);
+        it('should not allow the stream to be set', () => {
+            const opts = Object.assign({}, options);
             opts.stream = new MemoryStream();
-            expect(function () {
-                var transport = new DailyRotateFile(opts);
+            expect(() => {
+                const transport = new DailyRotateFile(opts);
                 expect(transport).to.not.be.null;
             }).to.throw();
         });
 
-        it('should raise the new event for a new log file', function (done) {
-            this.transport.on('new', function (newFile) {
+        it('should raise the new event for a new log file', (done) => {
+            this.transport.on('new', (newFile) => {
                 expect(newFile).to.equal(filename);
                 done();
             });
@@ -134,14 +129,14 @@ describe('winston/transports/daily-rotate-file', function () {
             this.transport.close();
         });
 
-        it('should raise the logRemoved event when pruning old log files', function (done) {
-            var opts = Object.assign({}, options);
+        it('should raise the logRemoved event when pruning old log files', (done) => {
+            const opts = Object.assign({}, options);
             opts.maxSize = '1k';
             opts.maxFiles = 1;
 
             this.transport = new DailyRotateFile(opts);
 
-            this.transport.on('logRemoved', function (removedFilename) {
+            this.transport.on('logRemoved', (removedFilename) => {
                 expect(removedFilename).to.equal(filename);
                 done();
             });
@@ -151,17 +146,17 @@ describe('winston/transports/daily-rotate-file', function () {
             this.transport.close();
         });
 
-        describe('when setting zippedArchive', function () {
-            it('should archive the log after rotating', function (done) {
-                var opts = Object.assign({}, options);
+        describe('when setting zippedArchive', () => {
+            it('should archive the log after rotating', (done) => {
+                const opts = Object.assign({}, options);
                 opts.zippedArchive = true;
                 opts.maxSize = '1k';
 
                 this.transport = new DailyRotateFile(opts);
 
                 const finishListener = () => {
-                    fs.readdir(logDir, function (err, files) {
-                        expect(files.filter(function (file) {
+                    fs.readdir(logDir,  (err, files) => {
+                        expect(files.filter( (file) => {
                             return path.extname(file) === '.gz';
                         }).length).to.equal(1);
                         done();
@@ -177,9 +172,9 @@ describe('winston/transports/daily-rotate-file', function () {
             });
         });
 
-        describe('when setting watchLog', function () {
-            it('should addWatcher to recreate log if deleted', function (done) {
-                var opts = Object.assign({}, options);
+        describe('when setting watchLog', () => {
+            it('should addWatcher to recreate log if deleted', (done) => {
+                const opts = Object.assign({}, options);
                 opts.watchLog = true;
                 this.transport = new DailyRotateFile(opts);
 
@@ -197,39 +192,38 @@ describe('winston/transports/daily-rotate-file', function () {
             });
         });
 
-        describe('query', function () {
-            it('should call callback when no files are present', function () {
-                this.transport.query(function (err, results) {
+        describe('query', () => {
+            it('should call callback when no files are present', () => {
+                this.transport.query((err, results) => {
                     expect(results).to.not.be.null;
                     expect(results.length).to.equal(0);
                 });
             });
 
-            it('should raise error when calling with stream', function () {
-                expect(function () {
-                    var transport = new DailyRotateFile({stream: new MemoryStream()});
+            it('should raise error when calling with stream', () => {
+                expect(() => {
+                    const transport = new DailyRotateFile({ stream: new MemoryStream() });
                     transport.query(null);
                 }).to.throw();
             });
 
-            it('should raise error when calling with json set to false', function () {
-                expect(function () {
-                    var opts = Object.assign({}, options);
+            it('should raise error when calling with json set to false', () => {
+                expect(() => {
+                    const opts = Object.assign({}, options);
                     opts.json = false;
-                    var transport = new DailyRotateFile(opts);
+                    const transport = new DailyRotateFile(opts);
                     transport.query(null);
                 }).to.throw();
             });
 
-            it('should return log entries that match the query', function (done) {
+            it('should return log entries that match the query', (done) => {
                 sendLogItem(this.transport, 'info', randomString(1056));
                 sendLogItem(this.transport, 'info', randomString(1056));
                 sendLogItem(this.transport, 'info', randomString(1056));
                 sendLogItem(this.transport, 'info', randomString(1056));
 
-                var self = this;
                 const finishListener = () => {
-                    self.transport.query(function (err, results) {
+                    this.transport.query((err, results) => {
                         expect(results).to.not.be.null;
                         expect(results.length).to.equal(4);
                         done();
@@ -242,8 +236,8 @@ describe('winston/transports/daily-rotate-file', function () {
                 this.transport.close();
             });
 
-            it('should search within archived files', function (done) {
-                var opts = Object.assign({}, options);
+            it('should search within archived files', (done) => {
+                const opts = Object.assign({}, options);
                 opts.zippedArchive = true;
                 opts.maxSize = '1k';
 
@@ -252,10 +246,8 @@ describe('winston/transports/daily-rotate-file', function () {
                 sendLogItem(this.transport, 'info', randomString(1056));
                 sendLogItem(this.transport, 'info', randomString(1056));
 
-                var self = this;
-
-                self.transport.on('archive', function () {
-                    self.transport.query(function (err, results) {
+                this.transport.on('archive', () => {
+                    this.transport.query((err, results) => {
                         expect(results).to.not.be.null;
                         expect(results.length).to.equal(2);
                         done();
@@ -267,7 +259,7 @@ describe('winston/transports/daily-rotate-file', function () {
         describe('concurrent', () => {
             it('should not throw EEXIST', async () => {
                 const logDir = path.join(__dirname, 'concurrent-logs');
-                await promisify(rimraf)(logDir);
+                await rimraf(logDir);
                 const workers = await Promise.all([
                     spawn(new Worker('./transport.worker.js')),
                     spawn(new Worker('./transport.worker.js')),
@@ -275,7 +267,7 @@ describe('winston/transports/daily-rotate-file', function () {
                 ]);
                 await Promise.all(workers.map(worker => worker.run()));
                 await Promise.all(workers.map(worker => Thread.terminate(worker)));
-            })
+            });
         })
     });
 });
