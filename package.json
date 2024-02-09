@@ -8,7 +8,8 @@
     "node": ">=8"
   },
   "scripts": {
-    "test": "mocha --ignore **/*.worker.js && eslint ."
+    "test": "mocha --ignore **/*.worker.js && eslint .",
+    "release": "release-script"
   },
   "repository": {
     "type": "git",
